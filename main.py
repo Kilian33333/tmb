@@ -1,27 +1,32 @@
 import pygame
 import sys
-from modules.movement import *
-from modules.ai import *
-from modules. import *
+from modules.story import *
+from modules.enemy import Enemy
+from modules.player import Player
+from modules.screenSet import *
+
 
 # --------------------
 # Setup
 # --------------------
 pygame.init()
-WIDTH, HEIGHT = 900, 500
-screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Knight Fighter - Story Mode")
 clock = pygame.time.Clock()
 font = pygame.font.SysFont("arial", 24)
 
-FLOOR_Y = 380
+WIDTH = screen.get_width()
+HEIGHT = screen.get_height()
+
+FLOOR_Y = 400
 MAX_FIGHTS = 20
 
 # --------------------
 # Assets
 # --------------------
+active_background = ["src\\old_forest.png", "src\\swapped_hills.png", "src\\wished_bridge.png", "src\\big_castle.png"]
+
 try:
-    background_img = pygame.image.load("assets/background.png").convert()
+    background_img = pygame.image.load(active_background[0]).convert()
     background_img = pygame.transform.scale(background_img, (WIDTH, HEIGHT))
 except:
     background_img = None
@@ -29,41 +34,7 @@ except:
 # --------------------
 # Classes
 # --------------------
-
-class Fighter:
-    def __init__(self, x, color, strength=10, is_player=False):
-        self.rect = pygame.Rect(x, FLOOR_Y - 80, 50, 80)
-        self.color = color
-        self.health = 100
-        self.strength = strength
-        self.speed = 4
-        self.is_player = is_player
-        self.attack_cooldown = 0
-
-    def draw(self):
-        pygame.draw.rect(screen, self.color, self.rect)
-
-    def move(self, keys):
-        if keys[pygame.K_a]:
-            self.rect.x -= self.speed
-        if keys[pygame.K_d]:
-            self.rect.x += self.speed
-
-    def ai_move(self, target):
-        if target.rect.centerx < self.rect.centerx:
-            self.rect.x -= self.speed - 1
-        else:
-            self.rect.x += self.speed - 1
-
-    def attack(self, target):
-        if self.attack_cooldown == 0:
-            if self.rect.colliderect(target.rect.inflate(20, 0)):
-                target.health -= self.strength
-            self.attack_cooldown = 30
-
-    def update(self):
-        if self.attack_cooldown > 0:
-            self.attack_cooldown -= 1
+# Fighter classes are now in modules: Player and Enemy
 
 
 # --------------------
@@ -99,14 +70,14 @@ def render_text_center(text):
 # --------------------
 
 def create_enemy(fight_number):
-    strength = 8 + fight_number * 2
-    color = (200, 50 + fight_number * 5 % 200, 50)
+    strength = 8 + fight_number * 1
+    color = (200, 50 + fight_number * 3 % 150, 50)
 
     if fight_number == MAX_FIGHTS:
-        strength *= 2
+        strength = int(strength * 2.5)
         color = (120, 0, 120)
 
-    return Fighter(650, color, strength)
+    return Enemy(650, color, health=100, strength=strength, fight_number=fight_number)
 
 
 def draw_ui(player, enemy, fight_number):
@@ -139,19 +110,27 @@ def fight_loop(player, enemy, fight_number):
         pygame.draw.rect(screen, (80, 60, 40), (0, FLOOR_Y, WIDTH, HEIGHT - FLOOR_Y))
 
         # Player
-        player.move(keys)
-        if keys[pygame.K_SPACE]:
-            player.attack(enemy)
+        player.move(keys, WIDTH, FLOOR_Y)
+        player.apply_gravity(FLOOR_Y)
+        player.block(keys)
+        
+        # Player attacks - Q for slash, E for thrust, R for spin
+        if keys[pygame.K_q]:
+            player.attack(enemy, "slash")
+        if keys[pygame.K_e]:
+            player.attack(enemy, "thrust")
+        if keys[pygame.K_r]:
+            player.attack(enemy, "spin")
 
         # Enemy AI
-        enemy.ai_move(player)
-        enemy.attack(player)
+        enemy.ai_move(player, WIDTH)
+        enemy.ai_attack(player)
 
         player.update()
         enemy.update()
 
-        player.draw()
-        enemy.draw()
+        player.draw(screen)
+        enemy.draw(screen)
 
         draw_ui(player, enemy, fight_number)
 
@@ -170,7 +149,7 @@ def fight_loop(player, enemy, fight_number):
 def main():
     show_cutscene("Knight of the North\n\nPress any key to begin your journey...")
 
-    player = Fighter(150, (50, 100, 255), strength=12, is_player=True)
+    player = Player(150, health=120, strength=12)
 
     for fight_number in range(1, MAX_FIGHTS + 1):
 
@@ -186,10 +165,10 @@ def main():
             pygame.quit()
             sys.exit()
 
-        player.health = min(100, player.health + 30)
+        player.health = min(player.max_health, player.health + 35)
 
         if fight_number % 5 == 0 and fight_number != MAX_FIGHTS:
-            show_cutscene(f"You defeated 5 enemies!\n\nYour legend grows...")
+            show_cutscene(f"You defeated {fight_number} enemies!\n\nYour legend grows...")
 
     show_cutscene("The kingdom is safe.\n\nYou are a true Knight.\n\nThe End")
 
