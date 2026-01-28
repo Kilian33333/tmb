@@ -14,10 +14,11 @@ class Enemy(Fighter):
     
     def __init__(self, x, color, health=100, strength=8, fight_number=1):
         super().__init__(x, color, health, strength)
-        self.rect = pygame.Rect(x, 240, 100, 160)  # FLOOR_Y - 160 (2x bigger)
+        self.rect = pygame.Rect(x, 340, 100, 160)
         self.speed = 3
         self.fight_number = fight_number
         self.attack_cooldown = 0
+        self.max_attack_cooldown = 0  # Track max for cooldown bar
         self.telegraph_cooldown = 0
         self.incoming_attack = None
         self.incoming_attack_symbol = None
@@ -75,7 +76,7 @@ class Enemy(Fighter):
             # Choose random attack
             attack_type = random.choice(list(self.ATTACKS.keys()))
             self._prepare_attack(attack_type)
-            self.decision_timer = random.randint(20, 60)
+            self.decision_timer = 60
         
         # Execute attack if telegraph is done
         if self.telegraph_cooldown <= 0 and self.incoming_attack:

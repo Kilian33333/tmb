@@ -1,9 +1,12 @@
 import pygame
 import sys
+from modules import enemy
+from modules import player
 from modules.story import *
 from modules.enemy import Enemy
 from modules.player import Player
 from modules.screenSet import *
+from modules.debug import draw_debug_info, debug_mode
 
 
 # --------------------
@@ -12,12 +15,12 @@ from modules.screenSet import *
 pygame.init()
 pygame.display.set_caption("Knight Fighter - Story Mode")
 clock = pygame.time.Clock()
-font = pygame.font.SysFont("arial", 24)
+font = pygame.font.Font("src\\Jacquard24-Regular.ttf", 24)
 
 WIDTH = screen.get_width()
 HEIGHT = screen.get_height()
 
-FLOOR_Y = 400
+FLOOR_Y = 500
 MAX_FIGHTS = 20
 
 # --------------------
@@ -92,6 +95,7 @@ def fight_loop(player, enemy, fight_number):
     running = True
 
     while running:
+        
         clock.tick(60)
         keys = pygame.key.get_pressed()
 
@@ -113,14 +117,41 @@ def fight_loop(player, enemy, fight_number):
         player.move(keys, WIDTH, FLOOR_Y)
         player.apply_gravity(FLOOR_Y)
         player.block(keys)
-        
-        # Player attacks - Q for slash, E for thrust, R for spin
+        global debug_mode
+
+        "f3 - open debug menu, f2 - close debug menu"
+        if keys[pygame.K_F3]:
+            print("F3 pressed")
+            debug_mode = True
+        if keys[pygame.K_F2]:
+            print("F2 pressed")
+            debug_mode = False
+
+        if debug_mode:
+          draw_debug_info(player, enemy)
+
+        #--------------------
+        # Player Attacks
+        #--------------------
         if keys[pygame.K_q]:
-            player.attack(enemy, "slash")
+            player.attack(enemy, "Front Kick")
         if keys[pygame.K_e]:
-            player.attack(enemy, "thrust")
+            player.attack(enemy, "High Kick")
         if keys[pygame.K_r]:
-            player.attack(enemy, "spin")
+            player.attack(enemy, "Upward swing")
+        if keys[pygame.K_c]:
+            player.attack(enemy, "Side head strike")
+        if keys[pygame.K_x]:
+            player.attack(enemy, "Direct Punch")        
+        if keys[pygame.K_f]:
+            player.attack(enemy, "Ultimate")
+
+        # Deal player damage if flag is set during cooldown
+        if hasattr(player, 'damage_dealt') and player.damage_dealt and player.attack_cooldown > 0:
+            if player.rect.colliderect(enemy.rect.inflate(20, 0)):
+                damage = player.ATTACKS[player.current_attack_type]["damage"]
+                enemy.take_damage(damage)
+            player.damage_dealt = False
 
         # Enemy AI
         enemy.ai_move(player, WIDTH)
@@ -141,6 +172,10 @@ def fight_loop(player, enemy, fight_number):
         if player.health <= 0:
             return False
 
+        # --------------------
+        # Debug Mode
+        # --------------------
+    
 
 # --------------------
 # Main Game
@@ -175,5 +210,11 @@ def main():
     pygame.quit()
 
 
+
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        print("Exception occurred. Press Ctrl+C to exit.")
