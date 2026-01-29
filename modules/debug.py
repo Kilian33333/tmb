@@ -23,6 +23,7 @@ def draw_debug_info(player, enemy):
         f"Attack CD: {player.attack_cooldown}",
         f"Block: {player.block_active}",
         f"Is Jumping: {player.is_jumping}",
+        f"Attack Type: {player.current_attack_type}",
     ]
     y_offset = 50
     for i, line in enumerate(player_info):

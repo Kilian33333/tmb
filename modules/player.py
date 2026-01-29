@@ -6,12 +6,12 @@ from .fighter import Fighter
 class Player(Fighter):
     # Attack types with their properties
     ATTACKS = {
-        "Front Kick": {"damage": 25, "cooldown": 30, "symbol": "1"},
-        "High Kick": {"damage": 40, "cooldown": 45, "symbol": "2"},
-        "Upward swing": {"damage": 55, "cooldown": 80, "symbol": "3"},
-        "Side head strike": {"damage": 50, "cooldown": 70, "symbol": "4"},
-        "Direct Punch": {"damage": 3, "cooldown": 7, "symbol": "5"},
-        "Ultimate": {"damage": 95, "cooldown": 150, "symbol": "6"},
+        "Front Kick": {"damage": 25, "cooldown": 60, "symbol": "1"},
+        "High Kick": {"damage": 40, "cooldown": 90, "symbol": "2"},
+        "Upward swing": {"damage": 55, "cooldown": 160, "symbol": "3"},
+        "Side head strike": {"damage": 50, "cooldown": 140, "symbol": "4"},
+        "Direct Punch": {"damage": 3, "cooldown": 14, "symbol": "5"},
+        "Ultimate": {"damage": 95, "cooldown": 300, "symbol": "6"},
     }
     
     def __init__(self, x, color=(50, 100, 255), health=120, strength=12):
@@ -54,10 +54,11 @@ class Player(Fighter):
     
     def move(self, keys, width, floor_y):
         """Move player with keyboard input and jumping"""
-        if keys[pygame.K_a]:
-            self.rect.x = max(0, self.rect.x - self.speed)
-        if keys[pygame.K_d]:
-            self.rect.x = min(width - self.rect.width, self.rect.x + self.speed)
+        if self.attack_cooldown == 0 or self.current_attack_type == "Direct Punch":
+            if keys[pygame.K_a]:
+                self.rect.x = max(0, self.rect.x - self.speed)
+            if keys[pygame.K_d]:
+                self.rect.x = min(width - self.rect.width, self.rect.x + self.speed)
         
         # Jumping with SPACE
         if keys[pygame.K_SPACE] and not self.is_jumping:
@@ -88,7 +89,7 @@ class Player(Fighter):
     
     def block(self, keys):
         """Toggle block (SHIFT key)"""
-        if keys[pygame.K_LSHIFT] or keys[pygame.K_RSHIFT]:
+        if (keys[pygame.K_LSHIFT] or keys[pygame.K_RSHIFT]) and self.attack_cooldown == 0:
             self.block_active = True
         else:
             self.block_active = False
@@ -103,9 +104,7 @@ class Player(Fighter):
         # Ensure at least 1 damage when an attack would otherwise deal 0
         if damage > 0 and actual_damage == 0:
             actual_damage = 1
-        new_health = super().take_damage(actual_damage)
-        print(f"Player.take_damage: incoming={damage}, after_resist={actual_damage}, new_health={new_health}")
-        return new_health
+        return super().take_damage(actual_damage)
     
     def update(self):
         """Update cooldowns and status"""

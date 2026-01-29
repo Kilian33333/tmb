@@ -7,9 +7,9 @@ from .fighter import Fighter
 class Enemy(Fighter):
     # Attack patterns with damage and symbols
     ATTACKS = {
-        "slash": {"damage": 8, "cooldown": 35, "symbol": "⚔", "telegraph_time": 10},
-        "smash": {"damage": 12, "cooldown": 50, "symbol": "↓", "telegraph_time": 12},
-        "thrust": {"damage": 10, "cooldown": 40, "symbol": "→", "telegraph_time": 11},
+        "slash": {"damage": 8, "cooldown": 60, "symbol": "⚔", "telegraph_time": 25},
+        "smash": {"damage": 12, "cooldown": 80, "symbol": "↓", "telegraph_time": 30},
+        "thrust": {"damage": 10, "cooldown": 120, "symbol": "→", "telegraph_time": 28},
     }
     
     def __init__(self, x, color, health=100, strength=8, fight_number=1):
@@ -76,7 +76,6 @@ class Enemy(Fighter):
         if self.decision_timer <= 0:
             # Choose random attack
             attack_type = random.choice(list(self.ATTACKS.keys()))
-            print(f"Enemy.ai_attack: choosing {attack_type}")
             self._prepare_attack(attack_type)
             self.decision_timer = 60
         
@@ -93,22 +92,12 @@ class Enemy(Fighter):
             self.incoming_attack_symbol = self.ATTACKS[attack_type]["symbol"]
             self.telegraph_cooldown = self.ATTACKS[attack_type]["telegraph_time"]
             self.attack_cooldown = self.ATTACKS[attack_type]["cooldown"]  # Set cooldown immediately
-            print(f"Enemy._prepare_attack: {attack_type}, telegraph={self.telegraph_cooldown}, cooldown={self.attack_cooldown}")
     
     def _execute_attack(self, target, attack_type):
         """Execute the telegraphed attack"""
-        # Debug: log collision and damage application
-        collided = False
-        try:
-            collided = self.rect.colliderect(target.rect.inflate(20, 0))
-        except Exception:
-            collided = False
-        if collided:
+        if self.rect.colliderect(target.rect.inflate(20, 0)):
             damage = self.ATTACKS[attack_type]["damage"]
-            print(f"Enemy executing {attack_type} -> collided: True, damage: {damage}")
             target.take_damage(damage, can_block=True)
-        else:
-            print(f"Enemy executing {attack_type} -> collided: False; enemy_rect={self.rect}, target_rect={getattr(target, 'rect', None)}")
     
     def take_damage(self, damage, can_block=False):
         """Take damage from player"""

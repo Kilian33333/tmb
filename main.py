@@ -133,18 +133,19 @@ def fight_loop(player, enemy, fight_number):
         #--------------------
         # Player Attacks
         #--------------------
-        if keys[pygame.K_q]:
-            player.attack(enemy, "Front Kick")
-        if keys[pygame.K_e]:
-            player.attack(enemy, "High Kick")
-        if keys[pygame.K_r]:
-            player.attack(enemy, "Upward swing")
-        if keys[pygame.K_c]:
-            player.attack(enemy, "Side head strike")
-        if keys[pygame.K_x]:
-            player.attack(enemy, "Direct Punch")        
-        if keys[pygame.K_f]:
-            player.attack(enemy, "Ultimate")
+        if player.block_active == False:
+            if keys[pygame.K_q]:
+                player.attack(enemy, "Front Kick")
+            if keys[pygame.K_e]:
+                player.attack(enemy, "High Kick")
+            if keys[pygame.K_r]:
+                player.attack(enemy, "Upward swing")
+            if keys[pygame.K_c]:
+                player.attack(enemy, "Side head strike")
+            if keys[pygame.K_x]:
+                player.attack(enemy, "Direct Punch")        
+            if keys[pygame.K_f]:
+                player.attack(enemy, "Ultimate")
 
         # Deal player damage if flag is set during cooldown
         if hasattr(player, 'damage_dealt') and player.damage_dealt and player.attack_cooldown > 0:
