@@ -100,7 +100,12 @@ class Player(Fighter):
         
         # Apply resistance
         actual_damage = int(damage * self.resistance)
-        return super().take_damage(actual_damage)
+        # Ensure at least 1 damage when an attack would otherwise deal 0
+        if damage > 0 and actual_damage == 0:
+            actual_damage = 1
+        new_health = super().take_damage(actual_damage)
+        print(f"Player.take_damage: incoming={damage}, after_resist={actual_damage}, new_health={new_health}")
+        return new_health
     
     def update(self):
         """Update cooldowns and status"""
