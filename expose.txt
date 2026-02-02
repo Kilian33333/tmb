@@ -1,0 +1,40 @@
+Exposé - Der Marodeurschlächter
+
+2D Streetfighter orientiertes Fantasy-Mittelalter Spiel mit eingebauter Story
+
+
+Das Spiel besteht aus einer Reihe von Kämpfen mit unterschiedlich starken Gegnern, je nach Ebene ändert sich ebenfalls der
+Hintergrund und verschiedene Zwischensequenzen werden zwischen den Kämpfen eingeblendet.
+
+Der Spieler sowie Gegner hat verschiedene Attacken und Mechaniken, wie angriffe, blocking und die Schwierigkeitsstufe des Gegners Ablaufen.
+
+Das Spiel hat ein aufwändiges Grafikdesign, das vorerst mit Vektorgrafiken oder Vorzeichnungen bearbeitet wurde.
+
+Die Story erzählt aus der sicht des Spielers der den Ritter Tarsuman, der ein verzaubertes Armulett trägt.
+Dieser Ritter Tarsuman hat es sich zur aufgabe gemacht, Bösewichte und Marodeure hinzurichten und Kampfkünste zu erlernen.
+
+Der Gegner wird mit einem ausgeklügeltem Algorhytmus ausgestattet, der ihm Sprigen, Attackieren und Blockieren mit einer gewissen Intelligenz ermöglicht.
+
+Anzahl der Gegner: 20, geplant sind diese Schwierigkeitsstufen:
+    recruits - Enemy 1-3
+    heavy_recruits - Enemy 4-5
+    heavy_knight - Enemy 6-10
+    veteran_knight - Enemy 11-15
+    elite_knight - Enemy 16-18
+    magic_knight - Enemy 19
+    the_king - Enemy 20 (final boss)
+
+Alle 5 Gegner = Neue Szene
+
+Diese Szenen wären:
+    Vorsequenz
+    old forest
+    Zwischensequenz
+    swapped hills
+    Zwischensequenz
+    wished bridge
+    Zwischensequenz
+    big castle
+    Endsequenz (Ende wenn gewonnen)
+
+Die Attacken des Gegners sowie Spielers haben unterschiedliche Eigenschaften, Längen und Schaden.

@@ -5,6 +5,24 @@ from .fighter import Fighter
 
 
 class Enemy(Fighter):
+#  Difficulty stages with stat multipliers
+    #Difficulty 1: recruits - Enemy 1-3
+    #Difficulty 2: heavy_recruits - Enemy 4-5
+    #Difficulty 3: heavy_knight - Enemy 6-10
+    #Difficulty 4: veteran_knight - Enemy 11-15
+    #Difficulty 5: elite_knight - Enemy 16-18
+    #Difficulty 6: magic_knight - Enemy 19
+    #Difficulty 7: the_king - Enemy 20 (final boss)
+
+    STAGES = {
+        "recruits": {"damage_multiplier": 0.8, "resistance": 0.9, "speed_multiplier": 1.1, "crit_chance": 0, "crit_addition": 0},
+        "heavy_recruits": {"damage_multiplier": 0.9, "resistance": 0.95, "speed_multiplier": 1.0, "crit_chance": 5, "crit_addition": 5},
+        "heavy_knight": {"damage_multiplier": 1.0, "resistance": 1.0, "speed_multiplier": 1.0, "crit_chance": 5, "crit_addition": 15},
+        "veteran_knight": {"damage_multiplier": 1.25, "resistance": 1.0, "speed_multiplier": 1.0, "crit_chance": 10, "crit_addition": 20},
+        "elite_knight": {"damage_multiplier": 1.5, "resistance": 1.5, "speed_multiplier": 0.9, "crit_chance": 10, "crit_addition": 40},
+        "magic_knight": {"damage_multiplier": 2.0, "resistance": 2.0, "speed_multiplier": 1.1, "crit_chance": 15, "crit_addition": 60},
+        "the_king": {"damage_multiplier": 3.0, "resistance": 3.0, "speed_multiplier": 1.0, "crit_chance": 20, "crit_addition": 100},
+    }
     # Attack patterns with damage and symbols
     ATTACKS = {
         "slash": {"damage": 8, "cooldown": 60, "symbol": "⚔", "telegraph_time": 25},
@@ -29,9 +47,8 @@ class Enemy(Fighter):
     
     def _scale_difficulty(self):
         """Scale stats based on fight number"""
-        scale = 1 + (self.fight_number * 0.15)
-        self.strength = int(self.strength * scale)
-        self.health = int(self.health * scale)
+        self.strength = int(self.strength)
+        self.health = int(self.health)
         self.max_health = self.health
     
     def draw(self, screen):
