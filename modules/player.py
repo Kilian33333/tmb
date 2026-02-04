@@ -14,7 +14,7 @@ class Player(Fighter):
         "Ultimate": {"damage": 95, "cooldown": 300, "symbol": "6"},
     }
     
-    def __init__(self, x, color=(50, 100, 255), health=120, strength=12):
+    def __init__(self, x, color=(50, 100, 255), health=100, strength=12):
         super().__init__(x, color, health, strength)
         self.rect = pygame.Rect(x, 170, 140, 198)  # 99:70 ratio, bigger size
         self.attack_cooldown = 0
@@ -22,7 +22,7 @@ class Player(Fighter):
         self.current_attack_type = "slash"
         self.block_active = False
         self.block_cooldown = 0
-        self.resistance = 0.7  # Takes 70% of damage (30% resistance)
+        self.resistance = 0.7
         self.can_block_attacks = ["slash", "thrust", "spin"]
         # Jump mechanics
         self.velocity_y = 0

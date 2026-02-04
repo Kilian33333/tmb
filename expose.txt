@@ -1,40 +1,376 @@
-Exposé - Der Marodeurschlächter
+╔════════════════════════════════════════════════════════════════════════╗
+║              EXPOSÉ - KNIGHT FIGHTER: STORY MODE                       ║
+║                    Der Ritter Tarsuman                                 ║
+╚════════════════════════════════════════════════════════════════════════╝
 
-2D Streetfighter orientiertes Fantasy-Mittelalter Spiel mit eingebauter Story
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+1. SPIELKONZEPT
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Knight Fighter ist ein 2D-Kämpfspiel im Street-Fighter-Stil, angesiedelt in 
+einer Fantasy-Mittelalter-Welt. Der Spieler verkörpert den Ritter Tarsuman, 
+der ein verzaubertes Armulett trägt. Seine Mission: Böswichte und Marodeure 
+aufspüren und besiegen, um die Königreiche zu schützen und seine Kampfkünste 
+zu vervollkommnen.
+
+Das Spiel verbindet intensive 1-gegen-1-Kampfmechaniken mit einer 
+fortlaufenden Story. Nach jedem Kampf wartet eine neue Herausforderung 
+– stärkere Gegner, neue Schauplätze und dramatische Zwischensequenzen.
 
 
-Das Spiel besteht aus einer Reihe von Kämpfen mit unterschiedlich starken Gegnern, je nach Ebene ändert sich ebenfalls der
-Hintergrund und verschiedene Zwischensequenzen werden zwischen den Kämpfen eingeblendet.
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+2. GAMEPLAY-MECHANIKEN
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-Der Spieler sowie Gegner hat verschiedene Attacken und Mechaniken, wie angriffe, blocking und die Schwierigkeitsstufe des Gegners Ablaufen.
+2.1 SPIELER-STEUERUNG (Q, E, R, C, X, F)
+├─ Front Kick (Q)
+│  ├─ Schaden: 25 HP
+│  ├─ Abklingzeit: 60 Frames (1 Sekunde)
+│  └─ Schneller, direkter Angriff
+│
+├─ High Kick (E)
+│  ├─ Schaden: 40 HP
+│  ├─ Abklingzeit: 90 Frames (1,5 Sekunden)
+│  └─ Mittlerer Schaden mit moderater Verzögerung
+│
+├─ Upward Swing (R)
+│  ├─ Schaden: 55 HP
+│  ├─ Abklingzeit: 160 Frames (2,67 Sekunden)
+│  └─ Kraftvoller oberer Hieb
+│
+├─ Side Head Strike (C)
+│  ├─ Schaden: 50 HP
+│  ├─ Abklingzeit: 140 Frames (2,33 Sekunden)
+│  └─ Präzisions-Kopfschlag
+│
+├─ Direct Punch (X)
+│  ├─ Schaden: 3 HP
+│  ├─ Abklingzeit: 14 Frames (0,23 Sekunden)
+│  └─ Schnelle Kombo-Attacke mit minimalem Schaden
+│
+└─ Ultimate (F)
+   ├─ Schaden: 95 HP
+   ├─ Abklingzeit: 300 Frames (5 Sekunden)
+   └─ Ultimative Spezialattacke mit maximalem Schaden
 
-Das Spiel hat ein aufwändiges Grafikdesign, das vorerst mit Vektorgrafiken oder Vorzeichnungen bearbeitet wurde.
+2.2 SPEZIAL-MECHANIKEN
+├─ Bewegung (A / D)
+│  └─ Steuert die horizontale Position des Spielers
+│
+├─ Springen (SPACE)
+│  ├─ Sprungkraft: -15
+│  ├─ Gravitation: 0,5
+│  └─ Taktisches Element für Ausweichmanöver
+│
+├─ Blockieren (SHIFT)
+│  ├─ Reduziert eingehenden Schaden um 70%
+│  ├─ Kann alle blockierbaren Angriffe abwehren
+│  └─ Visuelle Bestätigung durch grüne Rechteckumrandung
+│
+└─ Widerstandskraft
+   ├─ Passive Resistenz: 30%
+   ├─ Basis-Schadensmitigation
+   └─ Blockieren + Resistenz = bis zu 91% Schadensreduktion
 
-Die Story erzählt aus der sicht des Spielers der den Ritter Tarsuman, der ein verzaubertes Armulett trägt.
-Dieser Ritter Tarsuman hat es sich zur aufgabe gemacht, Bösewichte und Marodeure hinzurichten und Kampfkünste zu erlernen.
 
-Der Gegner wird mit einem ausgeklügeltem Algorhytmus ausgestattet, der ihm Sprigen, Attackieren und Blockieren mit einer gewissen Intelligenz ermöglicht.
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+3. GEGNER-SYSTEM
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-Anzahl der Gegner: 20, geplant sind diese Schwierigkeitsstufen:
-    recruits - Enemy 1-3
-    heavy_recruits - Enemy 4-5
-    heavy_knight - Enemy 6-10
-    veteran_knight - Enemy 11-15
-    elite_knight - Enemy 16-18
-    magic_knight - Enemy 19
-    the_king - Enemy 20 (final boss)
+3.1 GEGNER-ATTACKEN (Telegraph-System)
+├─ Slash (⚔)
+│  ├─ Schaden: 8 HP
+│  ├─ Abklingzeit: 60 Frames
+│  ├─ Telegraph-Zeit: 25 Frames
+│  └─ Schnelle, wiederholte Angriffe
+│
+├─ Smash (↓)
+│  ├─ Schaden: 12 HP
+│  ├─ Abklingzeit: 80 Frames
+│  ├─ Telegraph-Zeit: 30 Frames
+│  └─ Kräftiger Flächenschlag
+│
+└─ Thrust (→)
+   ├─ Schaden: 10 HP
+   ├─ Abklingzeit: 120 Frames
+   ├─ Telegraph-Zeit: 28 Frames
+   └─ Durchbohrende Stichattacke
 
-Alle 5 Gegner = Neue Szene
+3.2 GEGNER-KI (Artifical Intelligence)
+├─ Bewegungs-AI
+│  ├─ Automatisches Bewegung auf den Spieler zu
+│  ├─ Angriffsreichweite: ~40 Pixel
+│  └─ Intelligente Positionierung
+│
+├─ Angriffs-Entscheidung
+│  ├─ Zufällige Attackenauswahl
+│  ├─ Entscheidungs-Timer: 60 Frames
+│  ├─ Telegraph-Anzeige (visuell + Symbol)
+│  └─ Ausführung nach Telegraph-Phase
+│
+└─ Intelligentes Verhalten
+   ├─ Adaptive Strategien basierend auf Schwierigkeitsstufe
+   ├─ Kritische Treffer bei höheren Stufen
+   └─ Dynamische Resistenz und Geschwindigkeit
 
-Diese Szenen wären:
-    Vorsequenz
-    old forest
-    Zwischensequenz
-    swapped hills
-    Zwischensequenz
-    wished bridge
-    Zwischensequenz
-    big castle
-    Endsequenz (Ende wenn gewonnen)
 
-Die Attacken des Gegners sowie Spielers haben unterschiedliche Eigenschaften, Längen und Schaden.
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+4. SCHWIERIGKEITSSTUFEN & GEGNER
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+4.1 RECRUITS (Kämpfe 1-3)
+├─ Schaden-Multiplikator: 0.8x
+├─ Resistenz: 0.9x
+├─ Geschwindigkeit: 1.1x
+├─ Kritische Chance: 0%
+└─ Schwierigkeitsprogression: EINSTIEG
+
+4.2 HEAVY RECRUITS (Kämpfe 4-5)
+├─ Schaden-Multiplikator: 0.9x
+├─ Resistenz: 0.95x
+├─ Geschwindigkeit: 1.0x
+├─ Kritische Chance: 5% (+5 Zusatzschaden)
+└─ Schwierigkeitsprogression: ANFÄNGER
+
+4.3 HEAVY KNIGHT (Kämpfe 6-10)
+├─ Schaden-Multiplikator: 1.0x
+├─ Resistenz: 1.0x
+├─ Geschwindigkeit: 1.0x
+├─ Kritische Chance: 5% (+15 Zusatzschaden)
+└─ Schwierigkeitsprogression: NORMAL
+
+4.4 VETERAN KNIGHT (Kämpfe 11-15)
+├─ Schaden-Multiplikator: 1.25x
+├─ Resistenz: 1.0x
+├─ Geschwindigkeit: 1.0x
+├─ Kritische Chance: 10% (+20 Zusatzschaden)
+└─ Schwierigkeitsprogression: SCHWER
+
+4.5 ELITE KNIGHT (Kämpfe 16-18)
+├─ Schaden-Multiplikator: 1.5x
+├─ Resistenz: 1.5x
+├─ Geschwindigkeit: 0.9x (langsamer aber stärker)
+├─ Kritische Chance: 10% (+40 Zusatzschaden)
+└─ Schwierigkeitsprogression: SEHR SCHWER
+
+4.6 MAGIC KNIGHT (Kampf 19)
+├─ Schaden-Multiplikator: 2.0x
+├─ Resistenz: 2.0x
+├─ Geschwindigkeit: 1.1x
+├─ Kritische Chance: 15% (+60 Zusatzschaden)
+└─ Schwierigkeitsprogression: EXTREM SCHWER
+
+4.7 THE KING (Kampf 20 - FINAL BOSS)
+├─ Schaden-Multiplikator: 3.0x
+├─ Resistenz: 3.0x
+├─ Geschwindigkeit: 1.0x
+├─ Kritische Chance: 20% (+100 Zusatzschaden)
+├─ Farbe: Violett (120, 0, 120)
+├─ Health-Bonus: +150%
+└─ Schwierigkeitsprogression: MEISTER - FINALE
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+5. SPIELER-PROGRESSION
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Gesamt-Kämpfe: 20
+
+Start-Status des Spielers:
+├─ Health: 120 HP
+├─ Stärke: 12
+├─ Geschwindigkeit: 4
+└─ Resistenz: 30%
+
+Nach jedem Kampf:
+├─ Heilung: +35 HP (maximal bis zur vollen Gesundheit)
+├─ Level-Up: Gegner-Schwierigkeit erhöht sich
+└─ Jede 5. Gegner: Spezielle Zwischensequenz + neuer Schauplatz
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+6. STORY & SCHAUPLÄTZE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+6.1 ERZÄHLSTRUKTUR
+├─ Vorsequenz: Einleitung (Spielstart)
+├─ 20 Kämpfe mit eskalierender Schwierigkeit
+├─ 4 Hauptschauplätze (nach jeweils 5 Kämpfen neue Szenerie)
+├─ Zwischensequenzen nach jeweils 5 Gegnern
+└─ Endsequenz: Finale (nach Sieg oder Niederlage)
+
+6.2 SCHAUPLÄTZE & HINTERGRÜNDE
+├─ Old Forest (Kämpfe 1-5)
+│  └─ Atmosphäre: Düsteres Waldgebiet
+│
+├─ Swapped Hills (Kämpfe 6-10)
+│  └─ Atmosphäre: Hügelige Landschaft
+│
+├─ Wished Bridge (Kämpfe 11-15)
+│  └─ Atmosphäre: Historische Brücke
+│
+└─ Big Castle (Kämpfe 16-20)
+   └─ Atmosphäre: Königliche Festung (Final-Arena)
+
+6.3 STORY-ELEMENT: TARSUMANS ARMULETT
+├─ Der verzauberte Gegenstand verleiht dem Ritter besondere Fähigkeiten
+├─ Regeneration nach jedem Kampf
+├─ Passive Schadensresistenz
+└─ Verbindung zur Story-Narration
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+7. TECHNISCHE SPEZIFIKATIONEN
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+7.1 TECHNOLOGIE
+├─ Engine: Pygame 2.6.1
+├─ Programmiersprache: Python 3.13.7
+├─ Bildrate: 60 FPS
+├─ Auflösung: Dynamisch (Systemscreen)
+└─ Plattformen: Windows, Linux, macOS
+
+7.2 UI-ELEMENTE
+├─ Health-Bars (Oben links: Spieler | Oben rechts: Gegner)
+├─ Fight-Counter (Oben Mitte: "Fight X/20")
+├─ Angriffs-Cooldown-Bar (über Spieler)
+├─ Telegraph-Anzeige (über Gegner mit Symbol und Balken)
+├─ Blockier-Indikator (grüne Umrandung)
+└─ Debug-Menü (F3: aktiviert | F2: deaktiviert)
+
+7.3 DEBUG-MENÜ (F3 aktivieren)
+├─ TOP-LEFT (GRÜN): Spieler-Info
+│  ├─ Health / Max-Health
+│  ├─ Position (X, Y)
+│  ├─ Geschwindigkeit
+│  ├─ Angriffs-Abklingzeit
+│  ├─ Block-Status
+│  └─ Sprung-Status
+│
+├─ TOP-RIGHT (GRÜN): Gegner-Info
+│  ├─ Health / Max-Health
+│  ├─ Position (X, Y)
+│  ├─ Geschwindigkeit
+│  ├─ Angriffs-Abklingzeit
+│  ├─ Telegraph-Abklingzeit
+│  ├─ Eingehender Angriff
+│  └─ Entscheidungs-Timer
+│
+├─ BOTTOM-LEFT (GRÜN): Koordinaten
+│  ├─ Spieler-Mitte: (X, Y)
+│  ├─ Gegner-Mitte: (X, Y)
+│  └─ Distanz zwischen Figuren
+│
+└─ BOTTOM-RIGHT (GRÜN): Spielzustand
+   ├─ FPS: 60
+   ├─ Bildschirm-Auflösung
+   └─ Spieler-Schaden-Flag
+
+7.4 GRAFIK & DESIGN
+├─ Charakter-Design: Rechteck-Basiert (2D-Vektoren)
+├─ Gegner-Größe: 100x160 Pixel
+├─ Spieler-Größe: 140x198 Pixel
+├─ Animations-System: Frame-basiert
+├─ Font: Jacquard24-Regular (Cutscenes) | Consolas (Debug)
+├─ Farbsystem:
+│  ├─ Spieler: Blau (50, 100, 255)
+│  ├─ Gegner (Normal): Orange-Rot
+│  ├─ Gegner (Final Boss): Violett (120, 0, 120)
+│  ├─ Effekte: Gelb, Orange, Grün
+│  └─ UI: Weiß, Rot, Grün
+└─ Spezial-Effekte:
+   ├─ Telegraph-Symbole (⚔, ↓, →)
+   ├─ Progress-Balken
+   ├─ Cooldown-Indikatoren
+   └─ Blockier-Visualisierung
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+8. SPIELFLOW
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+START
+ │
+ ├─ Intro-Cutscene: "Knight of the North"
+ │
+ ├─ Spieler-Instanz erstellt (120 HP, 12 STR)
+ │
+ └─ FOR-Schleife: Kämpfe 1-20
+    │
+    ├─ [Kampf 5, 10, 15] → Zwischensequenz + neuer Hintergrund
+    │
+    ├─ Gegner erstellt (mit Schwierigkeitsmultiplikator)
+    │
+    ├─ [Kampf 20] → Final Boss (3x Multiplikator, violette Farbe)
+    │
+    ├─ FIGHT-LOOP (60 FPS)
+    │  │
+    │  ├─ Eingabe verarbeiten (Bewegung, Angriffe, Block)
+    │  ├─ Spieler-Physik (Sprung, Gravitation)
+    │  ├─ Gegner-AI (Bewegung, Entscheidung, Attacke)
+    │  ├─ Kollisions-Erkennung
+    │  ├─ Schaden-Berechnung (Resistenz, Block, Kritisch)
+    │  ├─ Cooldown-Management
+    │  ├─ Rendern (Hintergrund, Charaktere, UI)
+    │  └─ Abbruch bei: Tod eines Kämpfers
+    │
+    ├─ Sieg?
+    │  ├─ JA → Heilung (+35 HP), nächster Gegner
+    │  └─ NEIN → GAME OVER, Spielende
+    │
+    └─ [Nach Kampf 20] → Endsequenz: "The kingdom is safe."
+
+ENDE
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+9. PROJEKT-STRUKTUR (bisherige Planung)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+DMS/
+├─ main.py                      (Haupteinstiegspunkt & Fight-Loop)
+├─ start.bat                    (Windows Launcher)
+│
+├─ modules/
+│  ├─ __init__.py
+│  ├─ fighter.py                (Basis-Klasse für Spieler & Gegner)
+│  ├─ player.py                 (Spieler-Klasse mit Attacken & Mechaniken)
+│  ├─ enemy.py                  (Gegner-Klasse mit KI & Schwierigkeit)
+│  ├─ debug.py                  (Debug-Menü-System)
+│  ├─ screenSet.py              (Screen-Initialisierung)
+│  ├─ story.py                  (Story-Text & Cutscenes)
+│  └─ __pycache__/              (Kompilierte Python-Module)
+│
+├─ src/
+│  ├─ Jacquard24-Regular.ttf    (Spiel-Font)
+│  ├─ old_forest.png            (Hintergrund 1)
+│  ├─ swapped_hills.png         (Hintergrund 2)
+│  ├─ wished_bridge.png         (Hintergrund 3)
+│  └─ big_castle.png            (Hintergrund 4)
+│
+├─ README.md                    (Spielanleitung)
+├─ expose.txt                   (Dieses Dokument)
+└─ .gitignore
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+10. ZIEL & VISION
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Knight Fighter: Story Mode soll ein klassisches Arcade-Kampfspiel-Erlebnis
+bieten, das durch Story-Elemente, progressive Schwierigkeitssteigerung und
+strategische Gameplay-Mechaniken bereichert wird.
+
+Das Spiel zielt darauf ab:
+├─ Eine immersive Fantasy-Mittelalter-Atmosphäre zu schaffen
+├─ Intensive 1-gegen-1-Kämpfe mit Tiefgang zu bieten
+├─ Spieler durch progressive Challenges zu fordern und zu belohnen
+├─ Ein kohärentes Narrations-Erlebnis mit Cutscenes zu bieten
+├─ Replay-Value durch unterschiedliche Gegner-Strategien zu erhöhen
+└─ Klassische Fighting-Game-Mechaniken mit modernem Polish zu verbinden
+
+
+╔════════════════════════════════════════════════════════════════════════╗
+║         ENDE DES EXPOSÉS - Knight Fighter: Story Mode                  ║
+║                    Version 1.0 (Final Build)                           ║
+╚════════════════════════════════════════════════════════════════════════╝

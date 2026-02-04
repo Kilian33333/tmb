@@ -15,13 +15,13 @@ class Enemy(Fighter):
     #Difficulty 7: the_king - Enemy 20 (final boss)
 
     STAGES = {
-        "recruits": {"damage_multiplier": 0.8, "resistance": 0.9, "speed_multiplier": 1.1, "crit_chance": 0, "crit_addition": 0},
-        "heavy_recruits": {"damage_multiplier": 0.9, "resistance": 0.95, "speed_multiplier": 1.0, "crit_chance": 5, "crit_addition": 5},
-        "heavy_knight": {"damage_multiplier": 1.0, "resistance": 1.0, "speed_multiplier": 1.0, "crit_chance": 5, "crit_addition": 15},
-        "veteran_knight": {"damage_multiplier": 1.25, "resistance": 1.0, "speed_multiplier": 1.0, "crit_chance": 10, "crit_addition": 20},
-        "elite_knight": {"damage_multiplier": 1.5, "resistance": 1.5, "speed_multiplier": 0.9, "crit_chance": 10, "crit_addition": 40},
-        "magic_knight": {"damage_multiplier": 2.0, "resistance": 2.0, "speed_multiplier": 1.1, "crit_chance": 15, "crit_addition": 60},
-        "the_king": {"damage_multiplier": 3.0, "resistance": 3.0, "speed_multiplier": 1.0, "crit_chance": 20, "crit_addition": 100},
+        "recruits": {"damage_multiplier": 0.8, "resistance": 0.9, "speed_multiplier": 1.1, "crit_chance": 0, "crit_addition": 0, "strength_multiplier": 0 }, #Strength = knockback
+        "heavy_recruits": {"damage_multiplier": 0.9, "resistance": 0.95, "speed_multiplier": 1.0, "crit_chance": 5, "crit_addition": 5, "strength_multiplier": 0},
+        "heavy_knight": {"damage_multiplier": 1.0, "resistance": 1.0, "speed_multiplier": 1.0, "crit_chance": 5, "crit_addition": 15, "strength_multiplier": 0.1},
+        "veteran_knight": {"damage_multiplier": 1.25, "resistance": 1.0, "speed_multiplier": 1.0, "crit_chance": 10, "crit_addition": 20, "strength_multiplier": 0.2},
+        "elite_knight": {"damage_multiplier": 1.5, "resistance": 1.5, "speed_multiplier": 0.9, "crit_chance": 10, "crit_addition": 40, "strength_multiplier": 0.2},
+        "magic_knight": {"damage_multiplier": 2.0, "resistance": 2.0, "speed_multiplier": 1.1, "crit_chance": 15, "crit_addition": 60, "strength_multiplier": 0.5},
+        "the_king": {"damage_multiplier": 3.0, "resistance": 3.0, "speed_multiplier": 1.0, "crit_chance": 20, "crit_addition": 100, "strength_multiplier": 0.6},
     }
     # Attack patterns with damage and symbols
     ATTACKS = {
@@ -30,7 +30,7 @@ class Enemy(Fighter):
         "thrust": {"damage": 10, "cooldown": 120, "symbol": "→", "telegraph_time": 28},
     }
     
-    def __init__(self, x, color, health=100, strength=8, fight_number=1):
+    def __init__(self, x, color, health=100, strength=12, fight_number=1):
         super().__init__(x, color, health, strength)
         self.rect = pygame.Rect(x, 340, 100, 160)
         self.speed = 3

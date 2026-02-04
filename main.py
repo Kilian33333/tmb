@@ -16,6 +16,7 @@ pygame.init()
 pygame.display.set_caption("Knight Fighter - Story Mode")
 clock = pygame.time.Clock()
 font = pygame.font.Font("src\\Jacquard24-Regular.ttf", 24)
+bigger_font = pygame.font.Font("src\\Jacquard24-Regular.ttf", 48)
 
 WIDTH = screen.get_width()
 HEIGHT = screen.get_height()
@@ -84,11 +85,11 @@ def create_enemy(fight_number):
 
 
 def draw_ui(player, enemy, fight_number):
-    pygame.draw.rect(screen, (255,0,0), (50, 20, player.health * 2, 20))
-    pygame.draw.rect(screen, (255,0,0), (600, 20, enemy.health * 2, 20))
+    pygame.draw.rect(screen, (255,0,0), (25, 25, player.health * 5, 40))
+    pygame.draw.rect(screen, (255,0,0), (WIDTH - 25 - enemy.health * 5, 25, enemy.health * 5, 40))
 
-    txt = font.render(f"Fight {fight_number}/{MAX_FIGHTS}", True, (255,255,255))
-    screen.blit(txt, (400, 20))
+    txt = bigger_font.render(f"Fight {fight_number}/{MAX_FIGHTS}", True, (255,255,255))
+    screen.blit(txt, (WIDTH/2-txt.get_width()/2, 20))
 
 
 def fight_loop(player, enemy, fight_number):
@@ -185,7 +186,7 @@ def fight_loop(player, enemy, fight_number):
 def main():
     show_cutscene("Knight of the North\n\nPress any key to begin your journey...")
 
-    player = Player(150, health=120, strength=12)
+    player = Player(150)
 
     for fight_number in range(1, MAX_FIGHTS + 1):
 
