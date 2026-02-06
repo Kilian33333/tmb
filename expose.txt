@@ -1,13 +1,22 @@
 ╔════════════════════════════════════════════════════════════════════════╗
-║              EXPOSÉ - KNIGHT FIGHTER: STORY MODE                       ║
+║              EXPOSÉ - DER MARODEURSCHLÄCHTER: STORY MODE               ║
 ║                    Der Ritter Tarsuman                                 ║
 ╚════════════════════════════════════════════════════════════════════════╝
+
+Anmerkung: Game Mechaniken können sich im laufe der Entwicklung
+ändern, angepasst werden oder entfernt werden, dies ist eine bisherige
+übersicht der Planung und Entwicklung 
+
+Optionale ziele: 
+   ├─Animationen und speziefische Texturen
+   └─Erweiterte AI Mechanics
+
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 1. SPIELKONZEPT
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-Knight Fighter ist ein 2D-Kämpfspiel im Street-Fighter-Stil, angesiedelt in 
+DER MARODEURSCHLÄCHTER ist ein 2D-Kämpfspiel im Street-Fighter-Stil, angesiedelt in 
 einer Fantasy-Mittelalter-Welt. Der Spieler verkörpert den Ritter Tarsuman, 
 der ein verzaubertes Armulett trägt. Seine Mission: Böswichte und Marodeure 
 aufspüren und besiegen, um die Königreiche zu schützen und seine Kampfkünste 
@@ -284,6 +293,16 @@ Nach jedem Kampf:
    ├─ Cooldown-Indikatoren
    └─ Blockier-Visualisierung
 
+7.5 GRAFIK & DESIGN
+├─ Main menu
+   ├─Start
+   ├─Optionen (lautstärke, Auflösung)
+   └─Beenden
+└─Pause Menu
+   ├─Weiter
+   ├─Optionen
+   └─Beenden
+
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 8. SPIELFLOW
@@ -357,20 +376,18 @@ DMS/
 10. ZIEL & VISION
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-Knight Fighter: Story Mode soll ein klassisches Arcade-Kampfspiel-Erlebnis
+DER MARODEURSCHLÄCHTER: (Story Mode Only) soll ein klassisches Arcade-Kampfspiel-Erlebnis
 bieten, das durch Story-Elemente, progressive Schwierigkeitssteigerung und
 strategische Gameplay-Mechaniken bereichert wird.
 
 Das Spiel zielt darauf ab:
 ├─ Eine immersive Fantasy-Mittelalter-Atmosphäre zu schaffen
 ├─ Intensive 1-gegen-1-Kämpfe mit Tiefgang zu bieten
-├─ Spieler durch progressive Challenges zu fordern und zu belohnen
-├─ Ein kohärentes Narrations-Erlebnis mit Cutscenes zu bieten
+├─ Spieler durch progressive Challenges zu fordern und zu belohnen durch Fortschritten innerhalb der Story
 ├─ Replay-Value durch unterschiedliche Gegner-Strategien zu erhöhen
 └─ Klassische Fighting-Game-Mechaniken mit modernem Polish zu verbinden
 
 
 ╔════════════════════════════════════════════════════════════════════════╗
-║         ENDE DES EXPOSÉS - Knight Fighter: Story Mode                  ║
-║                    Version 1.0 (Final Build)                           ║
+║         ENDE DES EXPOSÉS - DER MARODEURSCHLÄCHTER                      ║
 ╚════════════════════════════════════════════════════════════════════════╝
