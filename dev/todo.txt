@@ -5,3 +5,4 @@ Adding the textures
  -> Adding diffrent attacks if player is falling for some attacks
  -> Adjusting the maximum attack height and the changing properties for diffrent attacks based on the height diffrence between player and enemy
  -> player should not jump while attacking and have effects and extras for some attacks while jumping or falling
+>>>>>>> 6e510e22734434d9377eb7e96403364ff3f52b43
