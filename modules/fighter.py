@@ -22,3 +22,4 @@ class Fighter:
     def is_alive(self):
         """Check if fighter is still alive"""
         return self.health > 0
+    

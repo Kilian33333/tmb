@@ -3,9 +3,12 @@
 ║                    Der Ritter Tarsuman                                 ║
 ╚════════════════════════════════════════════════════════════════════════╝
 
-Anmerkung: Game Mechaniken können sich im laufe der Entwicklung
+Kilian Demenzkie und Jannis Schulz
+
+Anmerkung: Game Mechaniken und stats können sich im laufe der Entwicklung
 ändern, angepasst werden oder entfernt werden, dies ist eine bisherige
 übersicht der Planung und Entwicklung 
+
 
 Optionale ziele: 
    ├─Animationen und speziefische Texturen
@@ -13,13 +16,13 @@ Optionale ziele:
 
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-1. SPIELKONZEPT
+1. SPIELKONZEPT (Festgelegt und wird definitiv umgesetzt)
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 DER MARODEURSCHLÄCHTER ist ein 2D-Kämpfspiel im Street-Fighter-Stil, angesiedelt in 
 einer Fantasy-Mittelalter-Welt. Der Spieler verkörpert den Ritter Tarsuman, 
 der ein verzaubertes Armulett trägt. Seine Mission: Böswichte und Marodeure 
-aufspüren und besiegen, um die Königreiche zu schützen und seine Kampfkünste 
+aufspüren und besiegen, um sein Königreich zu schützen und seine Kampfkünste 
 zu vervollkommnen.
 
 Das Spiel verbindet intensive 1-gegen-1-Kampfmechaniken mit einer 
@@ -30,6 +33,8 @@ fortlaufenden Story. Nach jedem Kampf wartet eine neue Herausforderung
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 2. GAMEPLAY-MECHANIKEN
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+(Einige Dieser Mechanics können sich mit Springen, Fallen usw. Kombinieren)
 
 2.1 SPIELER-STEUERUNG (Q, E, R, C, X, F)
 ├─ Front Kick (Q)
@@ -236,8 +241,7 @@ Nach jedem Kampf:
 ├─ Engine: Pygame 2.6.1
 ├─ Programmiersprache: Python 3.13.7
 ├─ Bildrate: 60 FPS
-├─ Auflösung: Dynamisch (Systemscreen)
-└─ Plattformen: Windows, Linux, macOS
+├─ Auflösung: Fullscreen, Non 
 
 7.2 UI-ELEMENTE
 ├─ Health-Bars (Oben links: Spieler | Oben rechts: Gegner)
@@ -379,6 +383,10 @@ DMS/
 DER MARODEURSCHLÄCHTER: (Story Mode Only) soll ein klassisches Arcade-Kampfspiel-Erlebnis
 bieten, das durch Story-Elemente, progressive Schwierigkeitssteigerung und
 strategische Gameplay-Mechaniken bereichert wird.
+
+Ebenfalls einige Hintergründe, Hintergrundmusiken und Atmosphärische und actiongeladene
+Effekte werden hinzugefügt, alles selbstgemacht, für ein DIY, mittelalterlich und
+Actionreiches Spielerlebnis.
 
 Das Spiel zielt darauf ab:
 ├─ Eine immersive Fantasy-Mittelalter-Atmosphäre zu schaffen

@@ -1,12 +1,13 @@
 """Player character with multiple attacks and blocking"""
 import pygame
 from .fighter import Fighter
-
+clock = pygame.time.Clock()
 
 class Player(Fighter):
     # Attack types with their properties
     ATTACKS = {
         "Front Kick": {"damage": 25, "cooldown": 60, "symbol": "1"},
+        "Rush Kick": {"damage": 25, "cooldown": 5, "symbol": "1.1"},
         "High Kick": {"damage": 40, "cooldown": 90, "symbol": "2"},
         "Upward swing": {"damage": 55, "cooldown": 160, "symbol": "3"},
         "Side head strike": {"damage": 50, "cooldown": 140, "symbol": "4"},
@@ -30,6 +31,9 @@ class Player(Fighter):
         self.jump_power = -15
         self.gravity = 0.5
         self.floor_y = 500
+        self.rush_kick_used_this_jump = False
+        self.facing = -1
+
         
     def draw(self, screen):
         """Draw player with health indicator and cooldown bar"""
@@ -57,13 +61,17 @@ class Player(Fighter):
         if self.attack_cooldown == 0 or self.current_attack_type == "Direct Punch":
             if keys[pygame.K_a]:
                 self.rect.x = max(0, self.rect.x - self.speed)
+                self.facing = 1
             if keys[pygame.K_d]:
                 self.rect.x = min(width - self.rect.width, self.rect.x + self.speed)
+                self.facing = -1
         
         # Jumping with SPACE
         if keys[pygame.K_SPACE] and not self.is_jumping:
-            self.velocity_y = self.jump_power
-            self.is_jumping = True
+            if self.attack_cooldown == 0:
+                self.velocity_y = self.jump_power
+                self.is_jumping = True
+                self.rush_kick_used_this_jump = False
     
     def apply_gravity(self, floor_y):
         """Apply gravity and update vertical position"""
@@ -75,15 +83,20 @@ class Player(Fighter):
             self.rect.bottom = floor_y
             self.velocity_y = 0
             self.is_jumping = False
+            self.rush_kick_used_this_jump = False
     
     def attack(self, target, attack_type="slash"):
         """Perform an attack on target - cooldown FIRST, then deal damage"""
+        if attack_type == "Rush Kick" and self.is_jumping and self.rush_kick_used_this_jump:
+            return
+        
         if self.attack_cooldown == 0 and attack_type in self.ATTACKS:
+            if attack_type == "Rush Kick" and self.is_jumping:
+                self.rush_kick_used_this_jump = True
+            
             self.current_attack_type = attack_type
-            # Start cooldown FIRST (animation time)
             self.attack_cooldown = self.ATTACKS[attack_type]["cooldown"]
             self.max_attack_cooldown = self.attack_cooldown
-            # After cooldown reaches a certain point, deal damage (2/3 through cooldown)
             self.damage_dealt = False
             self.damage_delay = int(self.ATTACKS[attack_type]["cooldown"] * 0.66)
     
@@ -97,11 +110,9 @@ class Player(Fighter):
     def take_damage(self, damage, can_block=True):
         """Take damage with resistance and block chance"""
         if self.block_active and can_block:
-            damage = int(damage * 0.3)  # Block reduces damage to 30%
+            damage = int(damage * 0.3)
         
-        # Apply resistance
         actual_damage = int(damage * self.resistance)
-        # Ensure at least 1 damage when an attack would otherwise deal 0
         if damage > 0 and actual_damage == 0:
             actual_damage = 1
         return super().take_damage(actual_damage)
@@ -110,7 +121,6 @@ class Player(Fighter):
         """Update cooldowns and status"""
         if self.attack_cooldown > 0:
             self.attack_cooldown -= 1
-            # Deal damage when delay is reached
             if hasattr(self, 'damage_delay') and self.attack_cooldown == self.damage_delay:
                 self.damage_dealt = True
         if self.block_cooldown > 0:

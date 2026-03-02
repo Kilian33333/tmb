@@ -24,6 +24,8 @@ def draw_debug_info(player, enemy):
         f"Block: {player.block_active}",
         f"Is Jumping: {player.is_jumping}",
         f"Attack Type: {player.current_attack_type}",
+        f"Facing: {player.facing}",
+        f"max_Attack_CD: {player.max_attack_cooldown}",
     ]
     y_offset = 50
     for i, line in enumerate(player_info):
@@ -40,6 +42,13 @@ def draw_debug_info(player, enemy):
         f"Telegraph CD: {enemy.telegraph_cooldown}",
         f"Incoming: {enemy.incoming_attack}",
         f"Decision: {enemy.decision_timer}",
+        f"Stage: {enemy.stage_name}",
+        f"Dmg Mult: {enemy.damage_multiplier}",
+        f"Resist: {enemy.resistance}",
+        f"Speed Mult: {enemy.speed_multiplier}",
+        f"Strength Mult: {enemy.strength_multiplier}",
+        f"Crit Chance: {enemy.crit_chance}%",
+        f"Crit Add: {enemy.crit_addition}",
     ]
     y_offset = 50
     for i, line in enumerate(enemy_info):

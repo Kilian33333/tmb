@@ -7,13 +7,19 @@ from modules.enemy import Enemy
 from modules.player import Player
 from modules.screenSet import *
 from modules.debug import draw_debug_info, debug_mode
+from modules.music import *
+
 
 
 # --------------------
 # Setup
 # --------------------
+
+devmode = False
+
 pygame.init()
 pygame.display.set_caption("Knight Fighter - Story Mode")
+init_mixer()
 clock = pygame.time.Clock()
 font = pygame.font.Font("src\\Jacquard24-Regular.ttf", 24)
 bigger_font = pygame.font.Font("src\\Jacquard24-Regular.ttf", 48)
@@ -74,7 +80,7 @@ def render_text_center(text):
 # --------------------
 
 def create_enemy(fight_number):
-    strength = 8 + fight_number * 1
+    strength = 9
     color = (200, 50 + fight_number * 3 % 150, 50)
 
     if fight_number == MAX_FIGHTS:
@@ -99,6 +105,8 @@ def fight_loop(player, enemy, fight_number):
         
         clock.tick(60)
         keys = pygame.key.get_pressed()
+        
+        update_music(fight_number, MAX_FIGHTS)
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -118,6 +126,10 @@ def fight_loop(player, enemy, fight_number):
         player.move(keys, WIDTH, FLOOR_Y)
         player.apply_gravity(FLOOR_Y)
         player.block(keys)
+
+        # Enemy
+        enemy.apply_gravity(FLOOR_Y)
+        
         global debug_mode
 
         "f3 - open debug menu, f2 - close debug menu"
@@ -130,15 +142,40 @@ def fight_loop(player, enemy, fight_number):
 
         if debug_mode:
           draw_debug_info(player, enemy)
+          
 
         #--------------------
         # Player Attacks
         #--------------------
+
+        #Devmode
+        if keys[pygame.K_F5]:
+            global devmode
+            devmode = True
+        elif keys[pygame.K_1] and devmode:
+            enemy.take_damage(666)
+        elif keys[pygame.K_2] and devmode:
+            player.take_damage(666)
+        elif keys[pygame.K_3] and devmode:
+            player.health = player.max_health
+        elif keys[pygame.K_4] and devmode:
+            enemy.health = enemy.max_health
+        elif keys[pygame.K_5] and devmode:
+            player.attack_cooldown = 0
+        elif keys[pygame.K_6] and devmode:
+            enemy.attack_cooldown = 0
+        elif keys[pygame.K_7] and devmode:
+            player.speed = 10
+        else:
+            pass
+
         if player.block_active == False:
-            if keys[pygame.K_q]:
+            if keys[pygame.K_q] and not player.is_jumping:
                 player.attack(enemy, "Front Kick")
+            if keys[pygame.K_q] and player.is_jumping:
+                player.attack(enemy, "Rush Kick")
             if keys[pygame.K_e]:
-                player.attack(enemy, "High Kick")
+                player.attack(enemy, "High Kick") and not player.is_jumping
             if keys[pygame.K_r]:
                 player.attack(enemy, "Upward swing")
             if keys[pygame.K_c]:
@@ -147,6 +184,42 @@ def fight_loop(player, enemy, fight_number):
                 player.attack(enemy, "Direct Punch")        
             if keys[pygame.K_f]:
                 player.attack(enemy, "Ultimate")
+            
+
+        def knockback( given_to, knockback_strength):
+            """Apply knockback once per-hit by setting a flag on the target.
+            Subsequent calls while the flag is set will do nothing.
+            """
+            if given_to == "enemy":
+                if getattr(enemy, 'knockback_applied', False):
+                    return None
+                enemy.rect.x = max(0, enemy.rect.x - knockback_strength*player.facing)
+                enemy.rect.y = max(0, enemy.rect.y - knockback_strength/3)
+
+                enemy.knockback_applied = True
+            elif given_to == "player":
+                if getattr(player, 'knockback_applied', False):
+                    return None
+                player.rect.x = max(0, player.rect.x + knockback_strength*enemy.facing)
+                player.rect.y = max(0, player.rect.y - knockback_strength/3)
+                player.knockback_applied = True
+            return None
+
+        if player.attack_cooldown == 1:
+            if getattr(enemy, 'knockback_applied', False):
+                enemy.knockback_applied = False
+            if getattr(player, 'knockback_applied', False):
+                player.knockback_applied = False
+
+        if player.attack_cooldown != 0:
+            if player.current_attack_type == "Rush Kick" and player.is_jumping == True:
+                player.rect.x = max(0, player.rect.x - 30)
+                player.rect.y = 150
+            elif player.current_attack_type == "High Kick" and enemy.rect.colliderect(player.rect.inflate(20, 0)) and player.attack_cooldown == round(player.max_attack_cooldown*0.65):
+                knockback("enemy", 300)
+            elif player.current_attack_type == "Upward swing" and enemy.rect.colliderect(player.rect.inflate(20, 0)) and player.attack_cooldown == round(player.max_attack_cooldown*0.65):
+                knockback("enemy", 700)
+                
 
         # Deal player damage if flag is set during cooldown
         if hasattr(player, 'damage_dealt') and player.damage_dealt and player.attack_cooldown > 0:
