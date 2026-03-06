@@ -10,8 +10,9 @@ pygame.display.set_caption("Main Menu")
 
 menu_button_font = pygame.font.Font("src\\Jacquard24-Regular.ttf", 60)
 
-start_button_rect = pygame.Rect(screen.get_width() / 2 - 80, screen.get_height() / 2 + 160, 200, 70)
-quit_button_rect = pygame.Rect(screen.get_width() / 2 + 150, screen.get_height() / 2 + 160, 200, 70)
+start_button_rect = pygame.Rect(screen.get_width() / 2 - 160, screen.get_height() / 2 + 160, 200, 70)
+guides_button_rect = pygame.Rect(screen.get_width() / 2 + 40, screen.get_height() / 2 + 160, 200, 70)
+quit_button_rect = pygame.Rect(screen.get_width() / 2 + 240, screen.get_height() / 2 + 160, 200, 70)
 
 play_menu_music()
 background_image_original = pygame.image.load("src\\knight_loading_screen.png").convert_alpha()
@@ -26,9 +27,10 @@ background_draw_x = int((screen_width - bg_scaled_width) / 2)
 
 underline_image = pygame.image.load("src\\underline_hover.png").convert_alpha()
  
-menu_options = [
+menu_guides = [
     {"rect": start_button_rect, "text": "Start", "blink": True, "action": "start"},
-    {"rect": quit_button_rect, "text": "Beenden", "blink": False, "action": "quit"}
+    {"rect": guides_button_rect, "text": "Guides", "blink": False, "action": "guides"},
+    {"rect": quit_button_rect, "text": "Quit", "blink": False, "action": "quit"}
 ]
 selected_index = 0
 
@@ -70,7 +72,7 @@ while running:
     screen.blit(background_image_scaled, (background_draw_x, 0))
 
     # Draw buttons with selection highlight
-    for i, option in enumerate(menu_options):
+    for i, option in enumerate(menu_guides):
         is_selected = (i == selected_index)
         draw_button(option["rect"], option["text"], is_selected=is_selected, blink=option["blink"])
 
@@ -79,11 +81,11 @@ while running:
             running = False
         elif event.type == pygame.KEYDOWN:
             if event.key == pygame.K_LEFT or event.key == pygame.K_UP:
-                selected_index = (selected_index - 1) % len(menu_options)
+                selected_index = (selected_index - 1) % len(menu_guides)
             elif event.key == pygame.K_RIGHT or event.key == pygame.K_DOWN:
-                selected_index = (selected_index + 1) % len(menu_options)
+                selected_index = (selected_index + 1) % len(menu_guides)
             elif event.key == pygame.K_RETURN:
-                action = menu_options[selected_index]["action"]
+                action = menu_guides[selected_index]["action"]
                 if action == "start":
                     pygame.mixer.music.stop()
                     main()

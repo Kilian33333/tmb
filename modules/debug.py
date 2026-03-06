@@ -26,6 +26,8 @@ def draw_debug_info(player, enemy):
         f"Attack Type: {player.current_attack_type}",
         f"Facing: {player.facing}",
         f"max_Attack_CD: {player.max_attack_cooldown}",
+        f"Ult Charge: {player.ultimate_charge}",
+        f"Is Enemy Hit: {getattr(player, 'damage_dealt', False)}",
     ]
     y_offset = 50
     for i, line in enumerate(player_info):

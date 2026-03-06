@@ -15,13 +15,13 @@ class Enemy(Fighter):
     #Difficulty 7: the_king - Enemy 20 (final boss)
 
     STAGES = {
-        "recruits": {"damage_multiplier": 0.8, "resistance": 0.9, "speed_multiplier": 1.1, "crit_chance": 0, "crit_addition": 0, "strength_multiplier": 0, "aggression": 0.6, "defense": 0.3, "shield_freq": 0.2 }, #Strength = knockback
-        "heavy_recruits": {"damage_multiplier": 0.9, "resistance": 0.95, "speed_multiplier": 1.0, "crit_chance": 5, "crit_addition": 5, "strength_multiplier": 0, "aggression": 0.7, "defense": 0.4, "shield_freq": 0.3},
-        "heavy_knight": {"damage_multiplier": 1.0, "resistance": 1.0, "speed_multiplier": 1.0, "crit_chance": 5, "crit_addition": 15, "strength_multiplier": 0.1, "aggression": 0.75, "defense": 0.5, "shield_freq": 0.4},
-        "veteran_knight": {"damage_multiplier": 1.25, "resistance": 1.0, "speed_multiplier": 1.0, "crit_chance": 10, "crit_addition": 20, "strength_multiplier": 0.2, "aggression": 0.8, "defense": 0.6, "shield_freq": 0.5},
-        "elite_knight": {"damage_multiplier": 1.5, "resistance": 1.5, "speed_multiplier": 0.9, "crit_chance": 10, "crit_addition": 40, "strength_multiplier": 0.2, "aggression": 0.85, "defense": 0.65, "shield_freq": 0.6},
-        "magic_knight": {"damage_multiplier": 2.0, "resistance": 2.0, "speed_multiplier": 1.1, "crit_chance": 15, "crit_addition": 60, "strength_multiplier": 0.5, "aggression": 0.9, "defense": 0.7, "shield_freq": 0.7},
-        "the_king": {"damage_multiplier": 3.0, "resistance": 3.0, "speed_multiplier": 1.0, "crit_chance": 20, "crit_addition": 100, "strength_multiplier": 0.6, "aggression": 1.0, "defense": 0.8, "shield_freq": 0.8},
+        "recruits": {"damage_multiplier": 0.8, "resistance": 0.9, "speed_multiplier": 1.1, "crit_chance": 0, "crit_addition": 0, "intelligence": "Low"}, 
+        "heavy_recruits": {"damage_multiplier": 0.9, "resistance": 0.95, "speed_multiplier": 1.0, "crit_chance": 5, "crit_addition": 0.05, "intelligence": "Low"},
+        "heavy_knight": {"damage_multiplier": 1.0, "resistance": 1.0, "speed_multiplier": 1.0, "crit_chance": 5, "crit_addition": 0.15, "intelligence": "Medium"},
+        "veteran_knight": {"damage_multiplier": 1.25, "resistance": 1.0, "speed_multiplier": 1.0, "crit_chance": 10, "crit_addition": 0.2, "intelligence": "Medium"},
+        "elite_knight": {"damage_multiplier": 1.5, "resistance": 1.5, "speed_multiplier": 0.9, "crit_chance": 10, "crit_addition": 0.4, "intelligence": "Medium"},
+        "magic_knight": {"damage_multiplier": 1.5, "resistance": 2.0, "speed_multiplier": 1.1, "crit_chance": 15, "crit_addition": 0.6, "intelligence": "High"},
+        "the_king": {"damage_multiplier": 2.0, "resistance": 3.0, "speed_multiplier": 1.0, "crit_chance": 20, "crit_addition": 1.0, "intelligence": "High"},
     }
     # Attack patterns with damage and symbols
     ATTACKS = {
@@ -83,7 +83,6 @@ class Enemy(Fighter):
         """Scale stats based on fight number and stage multipliers"""
         stage_multipliers = self.STAGES[self.stage_name]
         
-        self.strength = int(self.strength * (1 + stage_multipliers["strength_multiplier"]))
         self.speed = int(self.speed * stage_multipliers["speed_multiplier"])
         self.max_health = self.health
         
@@ -92,12 +91,8 @@ class Enemy(Fighter):
         self.damage_multiplier = stage_multipliers["damage_multiplier"]
         self.resistance = stage_multipliers["resistance"]
         self.speed_multiplier = stage_multipliers["speed_multiplier"]
-        self.strength_multiplier = stage_multipliers["strength_multiplier"]
         
         # Behavior multipliers
-        self.aggression = stage_multipliers["aggression"]
-        self.defense = stage_multipliers["defense"]
-        self.shield_freq = stage_multipliers["shield_freq"]
     
     def draw(self, screen):
         """Draw enemy with health bar and attack telegraph"""
@@ -123,7 +118,43 @@ class Enemy(Fighter):
             progress = max(0, self.telegraph_cooldown) / self.ATTACKS[self.incoming_attack]["telegraph_time"]
             pygame.draw.rect(screen, (100, 200, 100), (bar_x, bar_y, bar_width * progress, bar_height))
     
-    def ai_move(self, target, width):
+
+#---------------------------------------------
+#           +++Movement Algorythm+++
+#---------------------------------------------
+
+#Possible player (or specific enemy) states to react to:
+# - nearby wall
+# - being far from player
+# - Mid range from player
+# - Close to player
+# - Idle
+# - Attacking (with different attack types)
+# - Jumping
+# - blocking
+# - Using Ultimate
+#Enemy will react to these states with different behaviors:
+# - Idle
+# - Move towards player
+# - Move away from player
+# - Jump
+# - Shield
+# - Telegraphed attack (with different attack types)
+# - jump while moving towards player
+# - jump while moving away from player
+# - zick-zack movement
+
+#AI will act random every 3 ticks, with weighted probabilities based on player state and multiplies or divides by stage
+
+#Using probabilitys and multipliers/divisions per Player stage
+#Player is:
+# - far away: 50 Points Idle, 10 Points zick-zack, 10 Points move towards, 0 Others
+
+
+
+
+
+    def ai(self, target, width):
         """AI movement logic - move toward target"""
         distance = target.rect.centerx - self.rect.centerx
         
@@ -136,8 +167,8 @@ class Enemy(Fighter):
             self.facing = 1
         
         self.rect.x = max(0, min(width - self.rect.width, self.rect.x))
-    
-    def ai_attack(self, target):
+
+        
         """AI decision to attack"""
         if self.decision_timer <= 0:
             attack_type = random.choice(list(self.ATTACKS.keys()))
@@ -160,12 +191,18 @@ class Enemy(Fighter):
     def _execute_attack(self, target, attack_type):
         """Execute the telegraphed attack"""
         if self.rect.colliderect(target.rect.inflate(20, 0)):
-            damage = int(self.ATTACKS[attack_type]["damage"] * self.damage_multiplier)
+            #add critical hit chance
+            is_critical = random.random() < self.crit_addition
+            if is_critical:
+                damage = int(self.ATTACKS[attack_type]["damage"] * self.damage_multiplier * (self.crit_addition + 1))
+            else:
+                damage = int(self.ATTACKS[attack_type]["damage"] * self.damage_multiplier)
             target.take_damage(damage, can_block=True)
     
     def take_damage(self, damage, can_block=False):
         """Take damage from player"""
         return super().take_damage(damage/self.STAGES[self.stage_name]["resistance"])
+    
     
     def update(self):
         """Update cooldowns and timers"""
@@ -209,21 +246,3 @@ class Enemy(Fighter):
             self.shield_duration = self.max_shield_duration
             self.shield_cooldown = self.max_shield_cooldown
     
-    def ai_think(self, player, width):
-        """
-        SCAFFOLD: Implement stage-oriented AI behavior here.
-        Called once per frame in game loop.
-        
-        Use behavior multipliers:
-        - self.aggression: controls attack frequency 
-        - self.defense: controls defensive maneuvers
-        - self.shield_freq: controls shield usage
-        
-        Available actions:
-        - self.ai_move(player, width)
-        - self.ai_attack(player)
-        - self.jump()
-        - self.shield()
-        """
-        # TODO: Implement AI decision logic
-        pass

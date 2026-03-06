@@ -12,7 +12,7 @@ class Player(Fighter):
         "Upward swing": {"damage": 55, "cooldown": 160, "symbol": "3"},
         "Side head strike": {"damage": 50, "cooldown": 140, "symbol": "4"},
         "Direct Punch": {"damage": 3, "cooldown": 14, "symbol": "5"},
-        "Ultimate": {"damage": 95, "cooldown": 300, "symbol": "6"},
+        "Ultimate": {"damage": 40, "cooldown": 300, "symbol": "6"},
     }
     
     def __init__(self, x, color=(50, 100, 255), health=100, strength=12):
@@ -20,7 +20,7 @@ class Player(Fighter):
         self.rect = pygame.Rect(x, 170, 140, 198)  # 99:70 ratio, bigger size
         self.attack_cooldown = 0
         self.max_attack_cooldown = 0  # Track max for cooldown bar
-        self.current_attack_type = "slash"
+        self.current_attack_type = "Direct Punch"
         self.block_active = False
         self.block_cooldown = 0
         self.resistance = 0.7
@@ -33,6 +33,8 @@ class Player(Fighter):
         self.floor_y = 500
         self.rush_kick_used_this_jump = False
         self.facing = -1
+        self.ultimate_charge = 20
+        self.resist = False
 
         
     def draw(self, screen):
@@ -111,6 +113,8 @@ class Player(Fighter):
         """Take damage with resistance and block chance"""
         if self.block_active and can_block:
             damage = int(damage * 0.3)
+        elif self.resist:
+            damage = int(damage * 0.1)
         
         actual_damage = int(damage * self.resistance)
         if damage > 0 and actual_damage == 0:
