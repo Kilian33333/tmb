@@ -19,8 +19,8 @@ pygame.init()
 pygame.display.set_caption("Knight Fighter - Story Mode")
 init_mixer()
 clock = pygame.time.Clock()
-font = pygame.font.Font("src\\Jacquard24-Regular.ttf", 24)
-bigger_font = pygame.font.Font("src\\Jacquard24-Regular.ttf", 48)
+font = pygame.font.Font("src/Jacquard24-Regular.ttf", 24)
+bigger_font = pygame.font.Font("src/Jacquard24-Regular.ttf", 48)
 
 # Initialize cutscene manager
 CutsceneManager.init(screen, clock, font)
@@ -34,9 +34,9 @@ MAX_FIGHTS = 20
 # --------------------
 # Assets
 # --------------------
-active_background = ["src\\old_forest.png", "src\\swapped_hills.png", "src\\wished_bridge.png", "src\\big_castle.png"]
+active_background = ["src/old_forest.png", "src/swapped_hills.png", "src/wished_bridge.png", "src/big_castle.png"]
 
-ult_ui = pygame.image.load("src\\ult_ui.png").convert_alpha()
+ult_ui = pygame.image.load("src/ult_ui.png").convert_alpha()
 ult_ui = pygame.transform.scale(ult_ui, (170, 170))
 
 try:
