@@ -1,4 +1,5 @@
 import pygame
+import glob
 
 from modules.screenSet import screen
 
@@ -10,15 +11,59 @@ background_draw_x = int((screen.get_width() - scaled_width) / 2)
 
 fade_duration = 45  # frames for fade animation
 
+loading_font = pygame.font.Font("src/Jacquard24-Regular.ttf", 30)
+bar_width = 300
+bar_height = 20
+bar_x = (screen.get_width() - bar_width) // 2
+bar_y = screen.get_height() // 2 + 200
+
+# Collect all files to "load"
+def collect_files():
+    """Collect all .py files and assets to display during loading"""
+    files = []
+
+    # Get all python scripts & asset files
+    py_files = glob.glob("**/*.py", recursive=True)
+    files.extend([f"Loading {f}" for f in py_files])
+    asset_patterns = ["**/*.png", "**/*.ttf", "**/*.wav"]
+    for pattern in asset_patterns:
+        asset_files = glob.glob(pattern, recursive=True)
+        files.extend([f"Loading {f}" for f in asset_files])
+
+    return files
+
+loading_files = collect_files()
+frames_per_file = 17
+
+# returns the current loading file and progress percentage
+def get_loading_info(current_tick, display_duration):
+    if not loading_files:
+        return "Loading...", 0.0
+
+    file_index = min(current_tick // frames_per_file, len(loading_files) - 1)
+    progress = min((current_tick / frames_per_file) / len(loading_files), 1.0)
+
+    return loading_files[file_index], progress
+
 def splash(): # will return true as long as the splash screen is being drawn
     global tick
-    print(f"splash: {tick}")
-    print(background_draw_x)
-
     display_duration = 7 * 60  # 5 seconds at 60 fps
     total_duration = display_duration + fade_duration
 
     if tick < total_duration:
+
+        screen.blit(splash_image_scaled, (background_draw_x, 0))
+        # Draw loading information
+        loading_text, progress = get_loading_info(tick, display_duration)
+        pygame.draw.rect(screen, (50, 50, 50), (bar_x, bar_y, bar_width, bar_height))
+        fill_width = int(bar_width * progress) # loading bar fill
+        pygame.draw.rect(screen, (200, 200, 200), (bar_x, bar_y, fill_width, bar_height))
+        pygame.draw.rect(screen, (255, 255, 255), (bar_x, bar_y, bar_width, bar_height), 2)
+
+        text_surface = loading_font.render(loading_text, True, (255, 255, 255))
+        text_rect = text_surface.get_rect(center=(screen.get_width() // 2, bar_y + bar_height + 25))
+        screen.blit(text_surface, text_rect)
+
         # Calculate alpha for fade out
         if tick >= display_duration:
             fade_progress = (tick - display_duration) / fade_duration
@@ -26,11 +71,11 @@ def splash(): # will return true as long as the splash screen is being drawn
         else:
             alpha = 255
 
-        # apply alpha
-        splash_surface = splash_image_scaled.copy()
-        splash_surface.set_alpha(alpha)
-
-        screen.blit(splash_surface, (background_draw_x, 0))
+        # apply alpha as last
+        fade_surface = pygame.Surface((screen.get_width(), screen.get_height()))
+        fade_surface.fill((0,0,0))
+        fade_surface.set_alpha(255 - alpha)
+        screen.blit(fade_surface, (0, 0))
         pygame.display.flip()
         tick += 1
 
