@@ -50,7 +50,12 @@ class Enemy(Fighter):
 
         STAGENAMES = list(self.STAGES.keys())
         self.stage_name = STAGENAMES[min(self.stage_num, len(STAGENAMES))]
-        self.rect = pygame.Rect(x, 340, 100, 160)
+        # Damage hitbox (where enemy takes damage)
+        self.damage_rect = pygame.Rect(x, 340, 100, 160)
+        # Attack hitbox (where enemy deals damage - larger for attack reach)
+        self.attack_rect = pygame.Rect(x, 340, 140, 160)
+        # For backwards compatibility
+        self.rect = self.damage_rect
         self.speed = 3
         self.fight_number = fight_number
         self.attack_cooldown = 0
@@ -73,8 +78,11 @@ class Enemy(Fighter):
         self.shield_active = False
         self.shield_duration = 0
         self.shield_cooldown = 0
-        self.max_shield_duration = 60
-        self.max_shield_cooldown = 120
+        self.max_shield_duration = 300  # 5 seconds at 60fps
+        self.max_shield_cooldown = 900  # 15 seconds at 60fps
+        
+        # AI action tracking
+        self.current_action = "idle"
 
         # Scale difficulty
         self._scale_difficulty()
@@ -85,6 +93,7 @@ class Enemy(Fighter):
         
         self.speed = int(self.speed * stage_multipliers["speed_multiplier"])
         self.max_health = self.health
+        self.strength = int(self.strength * stage_multipliers["damage_multiplier"])
         
         self.crit_chance = stage_multipliers["crit_chance"]
         self.crit_addition = stage_multipliers["crit_addition"]
@@ -96,22 +105,22 @@ class Enemy(Fighter):
     
     def draw(self, screen):
         """Draw enemy with health bar and attack telegraph"""
-        pygame.draw.rect(screen, self.color, self.rect)
+        pygame.draw.rect(screen, self.color, self.damage_rect)
         
         # Draw shield if active
         if self.shield_active:
-            pygame.draw.rect(screen, (100, 150, 255), self.rect, 3)
+            pygame.draw.rect(screen, (100, 150, 255), self.damage_rect, 3)
         
         if self.telegraph_cooldown > 0 and self.incoming_attack_symbol:
             font = pygame.font.SysFont("arial", 40)
             symbol_surf = font.render(self.incoming_attack_symbol, True, (255, 100, 0))
-            symbol_rect = symbol_surf.get_rect(center=(self.rect.centerx, self.rect.top - 50))
+            symbol_rect = symbol_surf.get_rect(center=(self.damage_rect.centerx, self.damage_rect.top - 50))
             screen.blit(symbol_surf, symbol_rect)
             
             bar_width = 100
             bar_height = 8
-            bar_x = self.rect.centerx - bar_width // 2
-            bar_y = self.rect.top - 30
+            bar_x = self.damage_rect.centerx - bar_width // 2
+            bar_y = self.damage_rect.top - 30
             
             pygame.draw.rect(screen, (200, 0, 0), (bar_x, bar_y, bar_width, bar_height))
             # Green progress
@@ -125,14 +134,19 @@ class Enemy(Fighter):
 
 #Possible player (or specific enemy) states to react to:
 # - nearby wall
+# - Using Ultimate
 # - being far from player
 # - Mid range from player
-# - Close to player
-# - Idle
-# - Attacking (with different attack types)
-# - Jumping
-# - blocking
-# - Using Ultimate
+# - Close to player:
+    # - Idle
+    # - Attacking (with different attack types)
+    # - Jumping
+    # - blocking
+# - colliding with player
+    # - Idle
+    # - Attacking (with different attack types)
+    # - Jumping
+    # - blocking
 #Enemy will react to these states with different behaviors:
 # - Idle
 # - Move towards player
@@ -142,39 +156,156 @@ class Enemy(Fighter):
 # - Telegraphed attack (with different attack types)
 # - jump while moving towards player
 # - jump while moving away from player
-# - zick-zack movement
 
 #AI will act random every 3 ticks, with weighted probabilities based on player state and multiplies or divides by stage
 
 #Using probabilitys and multipliers/divisions per Player stage
 #Player is:
-# - far away: 50 Points Idle, 10 Points zick-zack, 10 Points move towards, 0 Others
+# - far away: 50 Points Idle, 10 Points move towards, 0 Others
+# - mid range: 30 Points Idle, 20 Points move towards, 5 Points move away, 10 Points jump, 10 Points shield, 0 Others
 
+# - close but not colliding:
+# - - idle: 20 Points Idle, 50 Points move towards, 5 Points move away, 5 Points jump, 0 Points shield, 10 Points attack
+# - - attacking: 10 Points Idle, 0 Points move towards, 20 Points move away, 5 Points jump, 70 Points shield, 30 Points attack
+# - - jumping: 20 Points Idle, 20 Points move towards, 5 Points move away, 2 Points jump, 0 Points shield, 10 Points attack
+# - - blocking: 10 Points Idle, 10 Points move towards, 30 Points move away, 5 Points jump, 0 Points shield, 5 Points attack
 
+# - colliding:
+# - - idle: 20 Points Idle, 5 Points move towards, 20 Points move away, 10 Points jump, 0 Points shield, 80 Points attack
+# - - attacking: 5 Points Idle, 0 Points move towards, 50 Points move away, 30 Points jump, 70 Points shield, 30 Points attack
+# - - jumping: 20 Points Idle, 0 Points move towards, 60 Points move away, 10 Points jump, 0 Points shield, 80 Points attack
+# - - blocking: 10 Points Idle, 0 Points move towards, 70 Points move away, 5 Points jump, 0 Points shield, 40 Points attack
 
+    player_states = ["far", "mid", "close_idle", "close_attacking", "close_jumping", "close_blocking", "colliding_idle", "colliding_attacking", "colliding_jumping", "colliding_blocking",]
+    chosing_states = ["idle", "move_towards", "move_away", "jump", "shield", "attack"]
+    chosing_states_weights = {
+        "far": [50, 30, 0, 0, 0, 0],
+        "mid": [30, 50, 10, 0, 10, 0],
+        "close_idle": [20, 50, 5, 5, 0, 10],
+        "close_attacking": [10, 0, 20, 5, 70, 30],
+        "close_jumping": [20, 20, 5, 2, 0, 10],
+        "close_blocking": [10, 10, 30, 5, 0, 5],
+        "colliding_idle": [20, 5, 20, 10, 0, 80],
+        "colliding_attacking": [5, 0, 50, 30, 70, 30],
+        "colliding_jumping": [20, 0, 60, 10, 0, 80],
+        "colliding_blocking": [10, 0, 70, 5, 0, 40],
+    }
 
-
+    def _get_player_state(self, target):
+        """Determine the player's current state"""
+        distance = abs(target.damage_rect.centerx - self.damage_rect.centerx)
+        collision = self.damage_rect.colliderect(target.damage_rect)
+        
+        # Define distance ranges
+        far_distance = 300
+        mid_distance = 150
+        
+        if distance > far_distance:
+            return "far"
+        elif distance > mid_distance:
+            return "mid"
+        else:
+            # Close range - check sub-states
+            if collision:
+                # Colliding - check player action
+                if hasattr(target, 'is_jumping') and target.is_jumping:
+                    return "colliding_jumping"
+                elif hasattr(target, 'shield_active') and target.shield_active:
+                    return "colliding_blocking"
+                elif hasattr(target, 'incoming_attack') and target.incoming_attack:
+                    return "colliding_attacking"
+                else:
+                    return "colliding_idle"
+            else:
+                # Close but not colliding - check player action
+                if hasattr(target, 'is_jumping') and target.is_jumping:
+                    return "close_jumping"
+                elif hasattr(target, 'shield_active') and target.shield_active:
+                    return "close_blocking"
+                elif hasattr(target, 'incoming_attack') and target.incoming_attack:
+                    return "close_attacking"
+                else:
+                    return "close_idle"
+    
+    def _calculate_action_weights(self, player_state):
+        """Calculate weighted probabilities based on player state and difficulty"""
+        base_weights = self.chosing_states_weights[player_state]
+        
+        # Get difficulty multiplier based on stage
+        # Higher stages are more aggressive and reactive
+        stage_multiplier = 1.0 + (self.stage_num * 0.15)
+        
+        # Apply stage multiplier to weights (more aggressive = higher attack/shield weights)
+        adjusted_weights = list(base_weights)
+        adjusted_weights[5] = int(adjusted_weights[5] * stage_multiplier)  # attack weight
+        adjusted_weights[4] = int(adjusted_weights[4] * stage_multiplier)  # shield weight
+        
+        return adjusted_weights
+    
+    def _choose_action(self, weights):
+        """Choose an action based on weighted probabilities"""
+        total_weight = sum(weights)
+        if total_weight == 0:
+            return "idle"
+        
+        choice = random.randint(0, total_weight - 1)
+        cumulative = 0
+        
+        for i, weight in enumerate(weights):
+            cumulative += weight
+            if choice < cumulative:
+                return self.chosing_states[i]
+        
+        return self.chosing_states[0]
+    
     def ai(self, target, width):
-        """AI movement logic - move toward target"""
-        distance = target.rect.centerx - self.rect.centerx
+        """AI movement logic with state-based decisions"""
+        distance = target.damage_rect.centerx - self.damage_rect.centerx
         
-        attack_range = 40
-        if distance > attack_range:
-            self.rect.x += self.speed
-            self.facing = -1
-        elif distance < -attack_range:
-            self.rect.x -= self.speed
-            self.facing = 1
-        
-        self.rect.x = max(0, min(width - self.rect.width, self.rect.x))
-
-        
-        """AI decision to attack"""
+        # Decide action every 30 frames for smoother gameplay
         if self.decision_timer <= 0:
-            attack_type = random.choice(list(self.ATTACKS.keys()))
-            self._prepare_attack(attack_type)
-            self.decision_timer = 60
+            player_state = self._get_player_state(target)
+            weights = self._calculate_action_weights(player_state)
+            self.current_action = self._choose_action(weights)
+            self.decision_timer = 30
         
+        # Execute the chosen action
+        if self.current_action == "move_towards":
+            if distance > 0:
+                self.damage_rect.x += self.speed
+                self.attack_rect.x += self.speed
+                self.facing = -1
+            else:
+                self.damage_rect.x -= self.speed
+                self.attack_rect.x -= self.speed
+                self.facing = 1
+        
+        elif self.current_action == "move_away":
+            if distance > 0:
+                self.damage_rect.x -= self.speed
+                self.attack_rect.x -= self.speed
+                self.facing = 1
+            else:
+                self.damage_rect.x += self.speed
+                self.attack_rect.x += self.speed
+                self.facing = -1
+        
+        elif self.current_action == "jump":
+            self.jump()
+        
+        elif self.current_action == "shield":
+            self.shield()
+        
+        elif self.current_action == "attack":
+            if self.attack_cooldown == 0:  # Only attack when not in cooldown
+                attack_type = random.choice(list(self.ATTACKS.keys()))
+                self._prepare_attack(attack_type)
+        
+        # Keep enemy in bounds
+        self.damage_rect.x = max(0, min(width - self.damage_rect.width, self.damage_rect.x))
+        self.attack_rect.x = max(0, min(width - self.attack_rect.width, self.attack_rect.x))
+        
+        # Execute telegraphed attack when telegraph ends
         if self.telegraph_cooldown <= 0 and self.incoming_attack:
             self._execute_attack(target, self.incoming_attack)
             self.incoming_attack = None
@@ -189,8 +320,8 @@ class Enemy(Fighter):
             self.attack_cooldown = self.ATTACKS[attack_type]["cooldown"]  # Set cooldown immediately
     
     def _execute_attack(self, target, attack_type):
-        """Execute the telegraphed attack"""
-        if self.rect.colliderect(target.rect.inflate(20, 0)):
+        """Execute the telegraphed attack - use attack_rect for hit detection and target's damage_rect for damage"""
+        if self.attack_rect.colliderect(target.damage_rect):
             #add critical hit chance
             is_critical = random.random() < self.crit_addition
             if is_critical:
@@ -225,11 +356,13 @@ class Enemy(Fighter):
     def apply_gravity(self, floor_y):
         """Apply gravity and update vertical position"""
         self.velocity_y += self.gravity
-        self.rect.y += self.velocity_y
+        self.damage_rect.y += self.velocity_y
+        self.attack_rect.y += self.velocity_y
         
         # Check if landed on floor
-        if self.rect.bottom >= floor_y:
-            self.rect.bottom = floor_y
+        if self.damage_rect.bottom >= floor_y:
+            self.damage_rect.bottom = floor_y
+            self.attack_rect.bottom = floor_y
             self.velocity_y = 0
             self.is_jumping = False
     

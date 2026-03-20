@@ -1,7 +1,49 @@
-Player should not move while attacking
+Working List
 
-Adding the textures
- -> Adding Height difference to the debug menu
- -> Adding diffrent attacks if player is falling for some attacks
- -> Adjusting the maximum attack height and the changing properties for diffrent attacks based on the height diffrence between player and enemy
- -> player should not jump while attacking and have effects and extras for some attacks while jumping or falling
+Weeks left: 10
+
+Needed:
+   -File "Overlay Effects"
+      -damage dealt
+      -camera shake
+      -let player know what is going on
+   
+   -work on Ui
+      Time: 1 Week
+
+   -textures
+      -Player
+         -Idle
+         -Front Kick
+         -Rush Kick
+         -Upward swing
+         -Side head strike
+         -Direct Punch
+         -Ultimate
+         -Walk
+         -Block
+      Time: 1 Week
+      -Enemy
+         -recruits
+         -heavy_recruits
+         -heavy_knight
+         -veteran_knight
+         -elite_knight
+         -magic_knight
+         -the_king
+      -Per Enemy
+         -Idle
+         -Walk
+         -slash
+         -smash
+         -thrust
+         -Block
+      Time:4 Weeks
+   -Cutscenes:
+      -Story
+      -Artwork
+      Time: 2 Weeks
+   -Backgrounds
+      -Time 2 Weeks
+   -Credits
+      -Time 1 Week

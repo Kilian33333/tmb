@@ -1,6 +1,9 @@
 """Player character with multiple attacks and blocking"""
 import pygame
+
+from modules import screenSet
 from .fighter import Fighter
+screen = screenSet.screen
 clock = pygame.time.Clock()
 
 class Player(Fighter):
@@ -17,7 +20,21 @@ class Player(Fighter):
     
     def __init__(self, x, color=(50, 100, 255), health=100, strength=12):
         super().__init__(x, color, health, strength)
-        self.rect = pygame.Rect(x, 170, 140, 198)  # 99:70 ratio, bigger size
+        # Damage hitbox (where player takes damage)
+        self.damage_rect = pygame.Rect(x, 170, 120, 198)
+        # Attack hitbox (where player deals damage)
+        self.attack_rect = pygame.Rect(x, 170, 198, 198)
+        # For backwards compatibility
+        self.rect = self.damage_rect
+        
+        self.image = None
+        try:
+            self.img_path = "src/player_idle_0.png"
+            self.image = pygame.image.load(self.img_path).convert_alpha()
+            self.image = pygame.transform.scale(self.image, (198, 198))
+        except:
+            print("Player image not found")
+
         self.attack_cooldown = 0
         self.max_attack_cooldown = 0  # Track max for cooldown bar
         self.current_attack_type = "Direct Punch"
@@ -38,19 +55,34 @@ class Player(Fighter):
 
         
     def draw(self, screen):
-        """Draw player with health indicator and cooldown bar"""
-        pygame.draw.rect(screen, self.color, self.rect)
+        """Draw player image with health indicator and cooldown bar"""
+        # Draw player image based on facing direction
+        if self.image:
+            img_to_draw = self.image
+            if self.facing == -1:  # Facing right, character on right side of image
+                self.attack_rect.x = self.damage_rect.x
+                img_x = self.damage_rect.x
+            else:  # Facing left (facing == 1), image extends left, flip image
+                img_x = self.damage_rect.x - (198/2)
+                img_to_draw = pygame.transform.flip(self.image, True, False)
+                self.attack_rect.x = self.damage_rect.x - (78)
+            
+            img_y = self.damage_rect.y
+            screen.blit(img_to_draw, (img_x, img_y))
+        else:
+            # Fallback to colored rect if image not loaded
+            pygame.draw.rect(screen, self.color, self.damage_rect)
         
         # Draw block indicator if active
         if self.block_active:
-            pygame.draw.rect(screen, (100, 200, 100), self.rect, 5)
+            pygame.draw.rect(screen, (100, 200, 100), self.damage_rect, 5)
         
         # Draw cooldown bar above player
         if self.max_attack_cooldown > 0:
             bar_width = 80
             bar_height = 8
-            bar_x = self.rect.centerx - bar_width // 2
-            bar_y = self.rect.top - 20
+            bar_x = self.damage_rect.centerx - bar_width // 2
+            bar_y = self.damage_rect.top - 20
             
             # Red background
             pygame.draw.rect(screen, (200, 0, 0), (bar_x, bar_y, bar_width, bar_height))
@@ -62,10 +94,12 @@ class Player(Fighter):
         """Move player with keyboard input and jumping"""
         if self.attack_cooldown == 0 or self.current_attack_type == "Direct Punch":
             if keys[pygame.K_a]:
-                self.rect.x = max(0, self.rect.x - self.speed)
+                self.damage_rect.x = max(0, self.damage_rect.x - self.speed)
+                self.attack_rect.x = max(0, self.attack_rect.x - self.speed)
                 self.facing = 1
             if keys[pygame.K_d]:
-                self.rect.x = min(width - self.rect.width, self.rect.x + self.speed)
+                self.damage_rect.x = min(width - self.damage_rect.width, self.damage_rect.x + self.speed)
+                self.attack_rect.x = min(width - self.attack_rect.width, self.attack_rect.x + self.speed)
                 self.facing = -1
         
         # Jumping with SPACE
@@ -78,11 +112,13 @@ class Player(Fighter):
     def apply_gravity(self, floor_y):
         """Apply gravity and update vertical position"""
         self.velocity_y += self.gravity
-        self.rect.y += self.velocity_y
+        self.damage_rect.y += self.velocity_y
+        self.attack_rect.y += self.velocity_y
         
         # Check if landed on floor
-        if self.rect.bottom >= floor_y:
-            self.rect.bottom = floor_y
+        if self.damage_rect.bottom >= floor_y:
+            self.damage_rect.bottom = floor_y
+            self.attack_rect.bottom = floor_y
             self.velocity_y = 0
             self.is_jumping = False
             self.rush_kick_used_this_jump = False
@@ -101,6 +137,16 @@ class Player(Fighter):
             self.max_attack_cooldown = self.attack_cooldown
             self.damage_dealt = False
             self.damage_delay = int(self.ATTACKS[attack_type]["cooldown"] * 0.66)
+    
+    @property
+    def image_rect(self):
+        """Return the rect of where the image is actually drawn"""
+        if self.facing == -1:  # Facing right, character on right side of image
+            img_x = self.damage_rect.x
+        else:  # Facing left (facing == 1), image extends left
+            img_x = self.damage_rect.x - 198
+        img_y = self.damage_rect.y
+        return pygame.Rect(img_x, img_y, 198, 198)
     
     def block(self, keys):
         """Toggle block (SHIFT key)"""

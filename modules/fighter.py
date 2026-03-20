@@ -2,7 +2,9 @@
 
 class Fighter:
     def __init__(self, x, color, health=100, strength=10, speed=4):
-        self.rect = None  # Will be set by subclass
+        self.damage_rect = None  # Hitbox for taking damage - Will be set by subclass
+        self.attack_rect = None  # Hitbox for dealing damage - Will be set by subclass
+        self.rect = None  # Deprecated - kept for compatibility, will use damage_rect
         self.color = color
         self.health = health
         self.max_health = health

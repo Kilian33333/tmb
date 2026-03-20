@@ -2,7 +2,7 @@ import pygame
 import sys
 from modules.player import *
 from modules.enemy import *
-from modules.story import *
+from modules.story import CutsceneManager
 from modules.screenSet import *
 from modules.debug import draw_debug_info, debug_mode
 from modules.music import *
@@ -21,6 +21,9 @@ init_mixer()
 clock = pygame.time.Clock()
 font = pygame.font.Font("src\\Jacquard24-Regular.ttf", 24)
 bigger_font = pygame.font.Font("src\\Jacquard24-Regular.ttf", 48)
+
+# Initialize cutscene manager
+CutsceneManager.init(screen, clock, font)
 
 WIDTH = screen.get_width()
 HEIGHT = screen.get_height()
@@ -47,28 +50,7 @@ except:
 # Story / Cutscene
 # --------------------
 
-def show_cutscene(text):
-    waiting = True
-    while waiting:
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                pygame.quit()
-                sys.exit()
-            if event.type == pygame.KEYDOWN:
-                waiting = False
 
-        screen.fill((0, 0, 0))
-        render_text_center(text)
-        pygame.display.update()
-        clock.tick(60)
-
-
-def render_text_center(text):
-    lines = text.split("\n")
-    for i, line in enumerate(lines):
-        surf = font.render(line, True, (255, 255, 255))
-        rect = surf.get_rect(center=(WIDTH//2, HEIGHT//2 + i * 30))
-        screen.blit(surf, rect)
 
 
 # --------------------
@@ -149,37 +131,51 @@ def fight_loop(player, enemy, fight_number):
         if keys[pygame.K_F2]:
             print("F2 pressed")
             debug_mode = False
-
-        if debug_mode:
-          draw_debug_info(player, enemy)
+        
+        # Import for accessing flag
+        from modules import debug
+        if debug.show_hitboxes:
+            debug.draw_hitboxes(player, enemy)
           
 
         #--------------------
         # Player Attacks
         #--------------------
 
-        #Devmode
+        #Devmode - F5 + Ctrl to activate
+        from modules import debug
+        global devmode, last_f5_ctrl_state
+        
         if keys[pygame.K_F5] and keys[pygame.K_LCTRL]:
-            global devmode
             devmode = True
-        elif keys[pygame.K_1] and devmode:
-            enemy.take_damage(666)
-        elif keys[pygame.K_2] and devmode:
-            player.take_damage(666)
-        elif keys[pygame.K_3] and devmode:
-            player.health = player.max_health
-        elif keys[pygame.K_4] and devmode:
-            enemy.health = enemy.max_health
-        elif keys[pygame.K_5] and devmode:
-            player.attack_cooldown = 0
-        elif keys[pygame.K_6] and devmode:
-            enemy.attack_cooldown = 0
-        elif keys[pygame.K_7] and devmode:
-            player.speed = 10
-        elif keys[pygame.K_8] and devmode:
-            player.ultimate_charge = 100
-        else:
-            pass
+        
+        # Devmode commands with F5 + Number
+        if devmode:
+            print("Dev mode command activated")
+            if debug_mode:
+                debug.toggle_hitboxes(True)
+                print("Hitboxes shown")
+            elif keys[pygame.K_1]:
+                enemy.take_damage(666)
+            elif keys[pygame.K_2]:
+                player.take_damage(666)
+            elif keys[pygame.K_3]:
+                player.health = player.max_health
+            elif keys[pygame.K_4]:
+                enemy.health = enemy.max_health
+            elif keys[pygame.K_5]:
+                player.attack_cooldown = 0
+            elif keys[pygame.K_6]:
+                enemy.attack_cooldown = 0
+            elif keys[pygame.K_7]:
+                player.speed = 10
+            elif keys[pygame.K_8]:
+                player.ultimate_charge = 100
+            elif keys[pygame.K_9]:
+                enemy.fight_number = 20
+            elif not debug_mode: 
+                debug.toggle_hitboxes(False)
+
 
         if player.block_active == False:
             if keys[pygame.K_q] and not player.is_jumping:
@@ -208,23 +204,31 @@ def fight_loop(player, enemy, fight_number):
                 
                 # Change knockback Direction based on position difference if shockwave:
                 if shockwave:
-                    if enemy.rect.centerx < player.rect.centerx:
-                        enemy.rect.x = max(0, enemy.rect.x - knockback_strength*1)
-                        enemy.rect.y = max(0, enemy.rect.y - knockback_strength/3)
+                    if enemy.damage_rect.centerx < player.damage_rect.centerx:
+                        enemy.damage_rect.x = max(0, enemy.damage_rect.x - knockback_strength*1)
+                        enemy.damage_rect.y = max(0, enemy.damage_rect.y - knockback_strength/3)
+                        enemy.attack_rect.x = max(0, enemy.attack_rect.x - knockback_strength*1)
+                        enemy.attack_rect.y = max(0, enemy.attack_rect.y - knockback_strength/3)
                         enemy.take_damage(50)
                     else:
-                        enemy.rect.x = max(0, enemy.rect.x - knockback_strength*-1)
-                        enemy.rect.y = max(0, enemy.rect.y - knockback_strength/3)
+                        enemy.damage_rect.x = max(0, enemy.damage_rect.x - knockback_strength*-1)
+                        enemy.damage_rect.y = max(0, enemy.damage_rect.y - knockback_strength/3)
+                        enemy.attack_rect.x = max(0, enemy.attack_rect.x - knockback_strength*-1)
+                        enemy.attack_rect.y = max(0, enemy.attack_rect.y - knockback_strength/3)
                 else:
-                    enemy.rect.x = max(0, enemy.rect.x - knockback_strength*player.facing)
-                    enemy.rect.y = max(0, enemy.rect.y - knockback_strength/3)
+                    enemy.damage_rect.x = max(0, enemy.damage_rect.x - knockback_strength*player.facing)
+                    enemy.damage_rect.y = max(0, enemy.damage_rect.y - knockback_strength/3)
+                    enemy.attack_rect.x = max(0, enemy.attack_rect.x - knockback_strength*player.facing)
+                    enemy.attack_rect.y = max(0, enemy.attack_rect.y - knockback_strength/3)
 
                 enemy.knockback_applied = True
             elif given_to == "player":
                 if getattr(player, 'knockback_applied', False):
                     return None
-                player.rect.x = max(0, player.rect.x + knockback_strength*enemy.facing)
-                player.rect.y = max(0, player.rect.y - knockback_strength/3)
+                player.damage_rect.x = max(0, player.damage_rect.x + knockback_strength*enemy.facing)
+                player.damage_rect.y = max(0, player.damage_rect.y - knockback_strength/3)
+                player.attack_rect.x = max(0, player.attack_rect.x + knockback_strength*enemy.facing)
+                player.attack_rect.y = max(0, player.attack_rect.y - knockback_strength/3)
                 player.knockback_applied = True
             return None
         #Ultimate Shockwave
@@ -236,15 +240,15 @@ def fight_loop(player, enemy, fight_number):
             shockwave_radius = int(50 + progress * 750)
             shockwave_surface = pygame.Surface((shockwave_max_radius*2, shockwave_max_radius*2), pygame.SRCALPHA)
             shockwave_color = (235, 235, 255, int(200 * (1 - progress)))
-            player.ultimate_charge = 0  
+            player.ultimate_charge = 0 
             
             # Draw expanding shockwave circles with fading effect, cut it at the bottom
             pygame.draw.circle(shockwave_surface, shockwave_color, (shockwave_max_radius, shockwave_max_radius), shockwave_radius, 70)
-            screen.blit(shockwave_surface, (player.rect.centerx - shockwave_max_radius, player.rect.centery - shockwave_max_radius))
+            screen.blit(shockwave_surface, (player.damage_rect.centerx - shockwave_max_radius, player.damage_rect.centery - shockwave_max_radius))
             pygame.draw.circle(shockwave_surface, shockwave_color, (shockwave_max_radius, shockwave_max_radius), shockwave_radius*0.66, 50)
-            screen.blit(shockwave_surface, (player.rect.centerx - shockwave_max_radius, player.rect.centery - shockwave_max_radius))
+            screen.blit(shockwave_surface, (player.damage_rect.centerx - shockwave_max_radius, player.damage_rect.centery - shockwave_max_radius))
             pygame.draw.circle(shockwave_surface, shockwave_color, (shockwave_max_radius, shockwave_max_radius), shockwave_radius*0.33, 30)
-            screen.blit(shockwave_surface, (player.rect.centerx - shockwave_max_radius, player.rect.centery - shockwave_max_radius))
+            screen.blit(shockwave_surface, (player.damage_rect.centerx - shockwave_max_radius, player.damage_rect.centery - shockwave_max_radius))
         
         if player.current_attack_type == "Ultimate" and round(player.attack_cooldown) > 0:
             player.resist = True
@@ -259,27 +263,31 @@ def fight_loop(player, enemy, fight_number):
 
         if player.attack_cooldown != 0:
             if player.current_attack_type == "Rush Kick" and player.is_jumping == True:
-                player.rect.x = max(0, player.rect.x - 30)
-                player.rect.y = 150
-            elif player.current_attack_type == "High Kick" and enemy.rect.colliderect(player.rect.inflate(20, 0)) and player.attack_cooldown == round(player.max_attack_cooldown*0.65):
+                player.damage_rect.x = max(0, player.damage_rect.x - 30)
+                player.damage_rect.y = 150
+                player.attack_rect.x = max(0, player.attack_rect.x - 30)
+                player.attack_rect.y = 150
+            elif player.current_attack_type == "High Kick" and enemy.damage_rect.colliderect(player.attack_rect) and player.attack_cooldown == round(player.max_attack_cooldown*0.65):
                 knockback("enemy", 300, False)
-            elif player.current_attack_type == "Upward swing" and enemy.rect.colliderect(player.rect.inflate(20, 0)) and player.attack_cooldown == round(player.max_attack_cooldown*0.65):
+            elif player.current_attack_type == "Upward swing" and enemy.damage_rect.colliderect(player.attack_rect) and player.attack_cooldown == round(player.max_attack_cooldown*0.65):
                 knockback("enemy", 700, False)
             
         #charge Ultimate if Player hits Enemy with different attack types
         if player.attack_cooldown == round(player.max_attack_cooldown*0.68) and (player.current_attack_type != "Direct Punch" or player.current_attack_type != "Ultimate"):
-            if player.rect.colliderect(enemy.rect.inflate(20, 0)):
+            if player.attack_rect.colliderect(enemy.damage_rect):
                 player.ultimate_charge = min(100, player.ultimate_charge + (player.ATTACKS[player.current_attack_type]["damage"] // 7))                
 
         # Deal player damage if flag is set during cooldown
         if hasattr(player, 'damage_dealt') and player.damage_dealt and player.attack_cooldown > 0:
-            if player.rect.colliderect(enemy.rect.inflate(20, 0)):
+            if player.attack_rect.colliderect(enemy.damage_rect):
                 damage = player.ATTACKS[player.current_attack_type]["damage"]
                 enemy.take_damage(damage)
             else:
                 pass
             player.damage_dealt = False
 
+        if debug_mode:
+            draw_debug_info(player, enemy)
         # Floor
         pygame.draw.rect(screen, (80, 60, 40), (0, FLOOR_Y, WIDTH, HEIGHT - FLOOR_Y))
 
@@ -311,30 +319,35 @@ def fight_loop(player, enemy, fight_number):
 # --------------------
 
 def main():
-    show_cutscene("Knight of the North\n\nPress any key to begin your journey...")
+    CutsceneManager.show(1)
 
     player = Player(150)
+    global devmode, last_f5_ctrl_state
 
     for fight_number in range(1, MAX_FIGHTS + 1):
-
         enemy = create_enemy(fight_number)
-
-        if fight_number == MAX_FIGHTS:
-            show_cutscene("The Dark Knight awaits...\n\nFinal Battle")
+        
+        if fight_number == 6:
+            CutsceneManager.show(3)
+        elif fight_number == 11:
+            CutsceneManager.show(4)
+        elif fight_number == 16:
+            CutsceneManager.show(5)
 
         win = fight_loop(player, enemy, fight_number)
+        
+        # Reset devmode state for next fight
+        devmode = False
+        last_f5_ctrl_state = False
 
         if not win:
-            show_cutscene("You have fallen...\n\nGame Over")
+            CutsceneManager.show(2)
             pygame.quit()
             sys.exit()
 
         player.health = min(player.max_health, player.health + 35)
 
-        if fight_number % 5 == 0 and fight_number != MAX_FIGHTS:
-            show_cutscene(f"You defeated {fight_number} enemies!\n\nYour legend grows...")
-
-    show_cutscene("The kingdom is safe.\n\nYou are a true Knight.\n\nThe End")
+    CutsceneManager.show(6)
 
     pygame.quit()
 
