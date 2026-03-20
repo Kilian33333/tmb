@@ -20,9 +20,18 @@ bar_height = 20
 bar_x = (screen.get_width() - bar_width) // 2
 bar_y = screen.get_height() // 2 + 200
 
-# Collect all files to "load"
+# Credits configuration
+credits = [
+    ["Development", "Kilian D."],
+    ["Music by", "Kilian D.", "Alen L."],
+    ["Artwork", "Kilian D."]
+]
+credit_display_duration = 120  # frames to show each credit
+credit_fade_duration = 45  # frames for fade in/out
+credit_cycle_tick = 0
+
+# Collect all asset files and python scripts
 def collect_files():
-    """Collect all .py files and assets to display during loading"""
     files = []
 
     # Get all python scripts & asset files
@@ -50,6 +59,41 @@ def get_loading_info(current_tick, display_duration):
     progress = min((current_tick / frames_per_file) / len(loading_files), 1.0)
 
     return loading_files[file_index], progress
+
+def get_current_credit_alpha(cycle_tick, total_duration, fade_duration):
+    if cycle_tick < fade_duration:
+        # Fade in
+        return int(255 * (cycle_tick / fade_duration))
+    elif cycle_tick < total_duration - fade_duration:
+        # Full opacity
+        return 255
+    else:
+        # Fade out
+        fade_out_progress = (cycle_tick - (total_duration - fade_duration)) / fade_duration
+        return int(255 * (1 - fade_out_progress))
+
+def draw_credits():
+    global credit_cycle_tick
+    total_cycle_duration = credit_display_duration + credit_fade_duration
+    credit_index = (credit_cycle_tick // total_cycle_duration) % len(credits)
+    cycle_position = credit_cycle_tick % total_cycle_duration
+    current_credit = credits[credit_index]
+    alpha = get_current_credit_alpha(cycle_position, credit_display_duration, credit_fade_duration)
+
+    # right side
+    credit_x = screen.get_width() - 250
+    credit_y = screen.get_height() // 2 - 50
+    title_surface = prompt_font.render(current_credit[0], True, (255, 255, 255))
+    title_surface.set_alpha(alpha)
+    screen.blit(title_surface, (credit_x, credit_y))
+
+    # Render credit names
+    for i, name in enumerate(current_credit[1:], 1):
+        name_surface = prompt_font.render(name, True, (200, 200, 200))
+        name_surface.set_alpha(alpha)
+        screen.blit(name_surface, (credit_x, credit_y + 30 * i))
+
+    credit_cycle_tick += 1
 
 def splash(): # will return true as long as the splash screen is being drawn
     global tick, loading_complete, fade_started
@@ -84,6 +128,9 @@ def splash(): # will return true as long as the splash screen is being drawn
 
     # Normal loading screen
     screen.blit(splash_image_scaled, (background_draw_x, 0))
+
+    # Draw cycling credits
+    draw_credits()
 
     # Draw loading information
     loading_text, progress = get_loading_info(tick, loading_duration)
