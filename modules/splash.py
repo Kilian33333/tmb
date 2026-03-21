@@ -22,11 +22,13 @@ bar_y = screen.get_height() // 2 + 200
 
 # Credits configuration
 credits = [
-    ["Development", "Kilian D."],
-    ["Music by", "Kilian D.", "Alen L."],
-    ["Artwork", "Kilian D."]
+    ["Main-Development:", "Kilian D."],
+    ["Programming:", "Kilian D.", "Co.Programming:", "Jannis S."],
+    ["Music by:", "Kilian D.","Mixing:", "Alen K."],
+    ["Artwork:", "Kilian D.", "Background and Character Art:", "Jannis S."],
+    ["Special Thanks:", "Alen K.", "Moritz G."]
 ]
-credit_display_duration = 120  # frames to show each credit
+credit_display_duration = 360  # frames to show each credit
 credit_fade_duration = 45  # frames for fade in/out
 credit_cycle_tick = 0
 
@@ -81,7 +83,7 @@ def draw_credits():
     alpha = get_current_credit_alpha(cycle_position, credit_display_duration, credit_fade_duration)
 
     # right side
-    credit_x = screen.get_width() - 250
+    credit_x = screen.get_width() - 370
     credit_y = screen.get_height() // 2 - 50
     title_surface = prompt_font.render(current_credit[0], True, (255, 255, 255))
     title_surface.set_alpha(alpha)
