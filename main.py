@@ -216,10 +216,11 @@ def fight_loop(player, enemy, fight_number):
                         enemy.attack_rect.x = max(0, enemy.attack_rect.x - knockback_strength*-1)
                         enemy.attack_rect.y = max(0, enemy.attack_rect.y - knockback_strength/3)
                 else:
-                    enemy.damage_rect.x = max(0, enemy.damage_rect.x - knockback_strength*player.facing)
-                    enemy.damage_rect.y = max(0, enemy.damage_rect.y - knockback_strength/3)
-                    enemy.attack_rect.x = max(0, enemy.attack_rect.x - knockback_strength*player.facing)
-                    enemy.attack_rect.y = max(0, enemy.attack_rect.y - knockback_strength/3)
+                    if not enemy.shield_active:
+                        enemy.damage_rect.x = max(0, enemy.damage_rect.x - knockback_strength*player.facing)
+                        enemy.damage_rect.y = max(0, enemy.damage_rect.y - knockback_strength/3)
+                        enemy.attack_rect.x = max(0, enemy.attack_rect.x - knockback_strength*player.facing)
+                        enemy.attack_rect.y = max(0, enemy.attack_rect.y - knockback_strength/3)
 
                 enemy.knockback_applied = True
             elif given_to == "player":
