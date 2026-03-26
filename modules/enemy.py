@@ -15,13 +15,13 @@ class Enemy(Fighter):
     #Difficulty 7: the_king - Enemy 20 (final boss)
 
     STAGES = {
-        "recruits": {"damage_multiplier": 0.8, "resistance": 0.9, "speed_multiplier": 1.1, "crit_chance": 0, "crit_addition": 0, "intelligence": "Low"}, 
-        "heavy_recruits": {"damage_multiplier": 0.9, "resistance": 0.95, "speed_multiplier": 1.0, "crit_chance": 5, "crit_addition": 0.05, "intelligence": "Low"},
-        "heavy_knight": {"damage_multiplier": 1.0, "resistance": 1.0, "speed_multiplier": 1.0, "crit_chance": 5, "crit_addition": 0.15, "intelligence": "Medium"},
-        "veteran_knight": {"damage_multiplier": 1.25, "resistance": 1.5, "speed_multiplier": 1.0, "crit_chance": 10, "crit_addition": 0.2, "intelligence": "Medium"},
-        "elite_knight": {"damage_multiplier": 1.5, "resistance": 2.5, "speed_multiplier": 0.9, "crit_chance": 10, "crit_addition": 0.4, "intelligence": "Medium"},
-        "magic_knight": {"damage_multiplier": 1.5, "resistance": 3.5, "speed_multiplier": 1.1, "crit_chance": 15, "crit_addition": 0.6, "intelligence": "High"},
-        "the_king": {"damage_multiplier": 2.0, "resistance": 5.5, "speed_multiplier": 1.0, "crit_chance": 20, "crit_addition": 1.0, "intelligence": "High"},
+        "recruits": {"damage_multiplier": 0.8, "resistance": 1.0, "speed_multiplier": 1.1, "crit_chance": 0, "crit_addition": 0, "intelligence": "Low"}, 
+        "heavy_recruits": {"damage_multiplier": 0.9, "resistance": 1.0, "speed_multiplier": 1.0, "crit_chance": 5, "crit_addition": 0.05, "intelligence": "Low"},
+        "heavy_knight": {"damage_multiplier": 1.0, "resistance": 2.0, "speed_multiplier": 1.0, "crit_chance": 5, "crit_addition": 0.15, "intelligence": "Medium"},
+        "veteran_knight": {"damage_multiplier": 1.25, "resistance": 2.5, "speed_multiplier": 1.0, "crit_chance": 10, "crit_addition": 0.2, "intelligence": "Medium"},
+        "elite_knight": {"damage_multiplier": 1.5, "resistance": 3.5, "speed_multiplier": 0.9, "crit_chance": 10, "crit_addition": 0.4, "intelligence": "Medium"},
+        "magic_knight": {"damage_multiplier": 1.5, "resistance": 4.5, "speed_multiplier": 1.1, "crit_chance": 15, "crit_addition": 0.6, "intelligence": "High"},
+        "the_king": {"damage_multiplier": 2.0, "resistance": 7.5, "speed_multiplier": 1.0, "crit_chance": 20, "crit_addition": 1.0, "intelligence": "High"},
     }
     # Attack patterns with damage and symbols
     ATTACKS = {
@@ -179,16 +179,16 @@ class Enemy(Fighter):
     player_states = ["far", "mid", "close_idle", "close_attacking", "close_jumping", "close_blocking", "colliding_idle", "colliding_attacking", "colliding_jumping", "colliding_blocking",]
     chosing_states = ["idle", "move_towards", "move_away", "jump", "shield", "attack"]
     chosing_states_weights = {
-        "far": [50, 30, 0, 0, 0, 0],
-        "mid": [30, 50, 10, 0, 10, 0],
-        "close_idle": [20, 50, 5, 5, 0, 10],
-        "close_attacking": [10, 0, 20, 5, 70, 30],
-        "close_jumping": [20, 20, 5, 2, 0, 10],
-        "close_blocking": [10, 10, 30, 5, 0, 5],
-        "colliding_idle": [20, 5, 20, 10, 0, 80],
-        "colliding_attacking": [5, 0, 50, 30, 70, 30],
-        "colliding_jumping": [20, 0, 60, 10, 0, 80],
-        "colliding_blocking": [10, 0, 70, 5, 0, 40],
+        "far":          [83, 57, 3, 0, 1, 12],
+        "mid":          [37, 68, 17, 2, 29, 7],
+        "close_idle":   [4, 23, 14, 19, 33, 72],
+        "close_attacking":[1, 6, 27, 11, 81, 88],
+        "close_jumping":[9, 31, 4, 52, 6, 63],
+        "close_blocking":[3, 16, 59, 8, 11, 41],
+        "colliding_idle":[2, 4, 42, 28, 21, 91],
+        "colliding_attacking":[0, 1, 12, 49, 93, 79],
+        "colliding_jumping":[6, 0, 83, 18, 1, 69],
+        "colliding_blocking":[1, 2, 91, 13, 0, 82],
     }
 
     def _get_player_state(self, target):
@@ -325,8 +325,10 @@ class Enemy(Fighter):
             #add critical hit chance
             is_critical = random.random() < self.crit_addition
             if is_critical:
+                print("Enemy landed a critical hit!")
                 damage = int(self.ATTACKS[attack_type]["damage"] * self.damage_multiplier * (self.crit_addition + 1))
             else:
+                print("Enemy landed a normal hit.")
                 damage = int(self.ATTACKS[attack_type]["damage"] * self.damage_multiplier)
             target.take_damage(damage, can_block=True)
     
