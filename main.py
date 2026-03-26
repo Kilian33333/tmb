@@ -1,3 +1,5 @@
+import math
+
 import pygame
 import sys
 from modules.player import *
@@ -156,7 +158,7 @@ def fight_loop(player, enemy, fight_number):
                 debug.toggle_hitboxes(True)
                 print("Hitboxes shown")
             elif keys[pygame.K_1]:
-                enemy.take_damage(666)
+                enemy.take_damage(100)
             elif keys[pygame.K_2]:
                 player.take_damage(666)
             elif keys[pygame.K_3]:
@@ -209,12 +211,12 @@ def fight_loop(player, enemy, fight_number):
                         enemy.damage_rect.y = max(0, enemy.damage_rect.y - knockback_strength/3)
                         enemy.attack_rect.x = max(0, enemy.attack_rect.x - knockback_strength*1)
                         enemy.attack_rect.y = max(0, enemy.attack_rect.y - knockback_strength/3)
-                        enemy.take_damage(50)
                     else:
                         enemy.damage_rect.x = max(0, enemy.damage_rect.x - knockback_strength*-1)
                         enemy.damage_rect.y = max(0, enemy.damage_rect.y - knockback_strength/3)
                         enemy.attack_rect.x = max(0, enemy.attack_rect.x - knockback_strength*-1)
                         enemy.attack_rect.y = max(0, enemy.attack_rect.y - knockback_strength/3)
+                    enemy.take_damage(int(200 / math.log((abs(player.x - enemy.x)/3) + 2)))
                 else:
                     if not enemy.shield_active:
                         enemy.damage_rect.x = max(0, enemy.damage_rect.x - knockback_strength*player.facing)
@@ -264,10 +266,8 @@ def fight_loop(player, enemy, fight_number):
 
         if player.attack_cooldown != 0:
             if player.current_attack_type == "Rush Kick" and player.is_jumping == True:
-                player.damage_rect.x = max(0, player.damage_rect.x - 30)
+                player.damage_rect.x = max(0, player.damage_rect.x - 30 / player.facing)
                 player.damage_rect.y = 150
-                player.attack_rect.x = max(0, player.attack_rect.x - 30)
-                player.attack_rect.y = 150
             elif player.current_attack_type == "High Kick" and enemy.damage_rect.colliderect(player.attack_rect) and player.attack_cooldown == round(player.max_attack_cooldown*0.65):
                 knockback("enemy", 300, False)
             elif player.current_attack_type == "Upward swing" and enemy.damage_rect.colliderect(player.attack_rect) and player.attack_cooldown == round(player.max_attack_cooldown*0.65):
