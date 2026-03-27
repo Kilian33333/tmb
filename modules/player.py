@@ -15,7 +15,7 @@ class Player(Fighter):
         "Upward swing": {"damage": 55, "cooldown": 160, "symbol": "3"},
         "Side head strike": {"damage": 50, "cooldown": 140, "symbol": "4"},
         "Direct Punch": {"damage": 3, "cooldown": 14, "symbol": "5"},
-        "Ultimate": {"damage": 40, "cooldown": 300, "symbol": "6"},
+        "Ultimate": {"damage": 70, "cooldown": 300, "symbol": "6"},
     }
     
     def __init__(self, x, color=(50, 100, 255), health=100, strength=12):
@@ -52,6 +52,7 @@ class Player(Fighter):
         self.facing = -1
         self.ultimate_charge = 20
         self.resist = False
+        self.damage_freeze_timer = 0  # Prevents damage for 20 ticks after enemy dies
 
         
     def draw(self, screen):
@@ -157,6 +158,10 @@ class Player(Fighter):
     
     def take_damage(self, damage, can_block=True):
         """Take damage with resistance and block chance"""
+        # Check if damage is frozen (after enemy dies)
+        if self.damage_freeze_timer > 0:
+            return self.health
+        
         if self.block_active and can_block:
             damage = int(damage * 0.3)
         elif self.resist:
@@ -175,3 +180,5 @@ class Player(Fighter):
                 self.damage_dealt = True
         if self.block_cooldown > 0:
             self.block_cooldown -= 1
+        if self.damage_freeze_timer > 0:
+            self.damage_freeze_timer -= 1

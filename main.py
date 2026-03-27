@@ -41,6 +41,8 @@ active_background = ["src/old_forest.png", "src/swapped_hills.png", "src/wished_
 ult_ui = pygame.image.load("src/ult_ui.png").convert_alpha()
 ult_ui = pygame.transform.scale(ult_ui, (170, 170))
 
+
+
 try:
     background_img = pygame.image.load(active_background[0]).convert()
     background_img = pygame.transform.scale(background_img, (WIDTH, HEIGHT))
@@ -103,7 +105,6 @@ def fight_loop(player, enemy, fight_number):
         clock.tick(60)
         keys = pygame.key.get_pressed()
         
-        update_music(fight_number, MAX_FIGHTS)
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -306,6 +307,7 @@ def fight_loop(player, enemy, fight_number):
         pygame.display.update()
 
         if enemy.health <= 0:
+            player.damage_freeze_timer = 20  # Freeze damage for 20 ticks after enemy dies
             return True
         if player.health <= 0:
             return False
