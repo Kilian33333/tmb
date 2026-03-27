@@ -1,5 +1,6 @@
 """Player character with multiple attacks and blocking"""
 import pygame
+import os
 
 from modules import screenSet
 from .fighter import Fighter
@@ -18,6 +19,15 @@ class Player(Fighter):
         "Ultimate": {"damage": 70, "cooldown": 300, "symbol": "6"},
     }
     
+    # Animation frame counts for different actions
+    ANIMATION_FRAMES = {
+        "idle": {"frames": 2, "speed": 10, "does_loop": True},
+        "attack": {"frames": 1, "speed": 5, "does_loop": False},
+        "jump": {"frames": 1, "speed": 1, "does_loop": False},
+        "block": {"frames": 1, "speed": 1, "does_loop": False},
+        "walk": {"frames": 2, "speed": 10, "does_loop": True},
+    }
+    
     def __init__(self, x, color=(50, 100, 255), health=100, strength=12):
         super().__init__(x, color, health, strength)
         # Damage hitbox (where player takes damage)
@@ -27,13 +37,15 @@ class Player(Fighter):
         # For backwards compatibility
         self.rect = self.damage_rect
         
+        # Animation system
+        self.animations = {}  # Store all loaded animations
+        self.current_action = "idle"  # Current action state
+        self.animation_frame = 0  # Current frame index
+        self.animation_counter = 0  # Counter for frame timing
         self.image = None
-        try:
-            self.img_path = "src/player_idle_0.png"
-            self.image = pygame.image.load(self.img_path).convert_alpha()
-            self.image = pygame.transform.scale(self.image, (198, 198))
-        except:
-            print("Player image not found")
+        
+        # Load all animations
+        self.load_animations()
 
         self.attack_cooldown = 0
         self.max_attack_cooldown = 0  # Track max for cooldown bar
@@ -53,6 +65,77 @@ class Player(Fighter):
         self.ultimate_charge = 20
         self.resist = False
         self.damage_freeze_timer = 0  # Prevents damage for 20 ticks after enemy dies
+    
+    def load_animations(self):
+        """Load all animation frames from src folder"""
+        animation_types = ["idle", "attack", "jump", "block", "walk"]
+        
+        for anim_type in animation_types:
+            self.animations[anim_type] = []
+            frame_count = self.ANIMATION_FRAMES[anim_type]["frames"]
+            
+            # Try to load frames for this animation
+            for frame_num in range(frame_count):
+                filename = f"src/player_{anim_type}_{frame_num}.png"
+                try:
+                    if os.path.exists(filename):
+                        img = pygame.image.load(filename).convert_alpha()
+                        img = pygame.transform.scale(img, (198, 198))
+                        self.animations[anim_type].append(img)
+                    else:
+                        print(f"Animation frame not found: {filename}")
+                except Exception as e:
+                    print(f"Error loading {filename}: {e}")
+            
+            # If no frames loaded, use a placeholder
+            if not self.animations[anim_type]:
+                print(f"Warning: No frames loaded for {anim_type} animation")
+                self.animations[anim_type] = [None]
+        
+        # Set initial image
+        if self.animations["idle"]:
+            self.image = self.animations["idle"][0]
+    
+    def update_animation(self):
+        """Update animation frame based on current action"""
+        action = self.current_action
+        
+        if action not in self.animations:
+            return
+        
+        frames = self.animations[action]
+        if not frames:
+            return
+        
+        animation_speed = self.ANIMATION_FRAMES[action]["speed"]
+        self.animation_counter += 1
+        
+        # Change frame based on animation speed
+        if self.animation_counter >= animation_speed:
+            self.animation_counter = 0
+            self.animation_frame += 1
+            
+            # Loop animation or stop at last frame
+            if self.animation_frame >= len(frames):
+                if self.ANIMATION_FRAMES[action]["does_loop"]:
+                    # Loop animation
+                    self.animation_frame = 0
+                else:
+                    # Non-looping animation: return to idle
+                    self.current_action = "idle" if not self.is_jumping else "jump"
+                    self.animation_frame = 0
+        
+        # Get current frame image
+        current_frame_index = min(self.animation_frame, len(frames) - 1)
+        if frames[current_frame_index]:
+            self.image = frames[current_frame_index]
+    
+    def set_animation(self, action):
+        """Set the current animation action"""
+        if action != self.current_action:
+            self.current_action = action
+            self.animation_frame = 0
+            self.animation_counter = 0
 
         
     def draw(self, screen):
@@ -93,15 +176,26 @@ class Player(Fighter):
     
     def move(self, keys, width, floor_y):
         """Move player with keyboard input and jumping"""
+        is_moving = False
         if self.attack_cooldown == 0 or self.current_attack_type == "Direct Punch":
             if keys[pygame.K_a]:
                 self.damage_rect.x = max(0, self.damage_rect.x - self.speed)
                 self.attack_rect.x = max(0, self.attack_rect.x - self.speed)
                 self.facing = 1
+                if self.current_action != "walk":
+                    self.set_animation("walk")
+                is_moving = True
             if keys[pygame.K_d]:
                 self.damage_rect.x = min(width - self.damage_rect.width, self.damage_rect.x + self.speed)
                 self.attack_rect.x = min(width - self.attack_rect.width, self.attack_rect.x + self.speed)
                 self.facing = -1
+                if self.current_action != "walk":
+                    self.set_animation("walk")
+                is_moving = True
+        
+        # Return to idle if not moving
+        if not is_moving and self.current_action == "walk" and not self.is_jumping:
+            self.set_animation("idle")
         
         # Jumping with SPACE
         if keys[pygame.K_SPACE] and not self.is_jumping:
@@ -109,6 +203,7 @@ class Player(Fighter):
                 self.velocity_y = self.jump_power
                 self.is_jumping = True
                 self.rush_kick_used_this_jump = False
+                self.set_animation("jump")
     
     def apply_gravity(self, floor_y):
         """Apply gravity and update vertical position"""
@@ -123,6 +218,9 @@ class Player(Fighter):
             self.velocity_y = 0
             self.is_jumping = False
             self.rush_kick_used_this_jump = False
+            # Return to idle animation when landing
+            if self.current_action == "jump":
+                self.set_animation("idle")
     
     def attack(self, target, attack_type="slash"):
         """Perform an attack on target - cooldown FIRST, then deal damage"""
@@ -138,6 +236,9 @@ class Player(Fighter):
             self.max_attack_cooldown = self.attack_cooldown
             self.damage_dealt = False
             self.damage_delay = int(self.ATTACKS[attack_type]["cooldown"] * 0.66)
+            
+            # Trigger attack animation
+            self.set_animation("attack")
     
     @property
     def image_rect(self):
@@ -153,8 +254,12 @@ class Player(Fighter):
         """Toggle block (SHIFT key)"""
         if (keys[pygame.K_LSHIFT] or keys[pygame.K_RSHIFT]) and self.attack_cooldown == 0:
             self.block_active = True
+            if self.current_action != "block":
+                self.set_animation("block")
         else:
             self.block_active = False
+            if self.current_action == "block":
+                self.set_animation("idle")
     
     def take_damage(self, damage, can_block=True):
         """Take damage with resistance and block chance"""
@@ -182,3 +287,13 @@ class Player(Fighter):
             self.block_cooldown -= 1
         if self.damage_freeze_timer > 0:
             self.damage_freeze_timer -= 1
+        
+        # Update animations
+        self.update_animation()
+        
+        # Return to idle if attack finishes
+        if self.current_action == "attack" and self.attack_cooldown == 0:
+            if self.is_jumping:
+                self.set_animation("jump")
+            else:
+                self.set_animation("idle")
