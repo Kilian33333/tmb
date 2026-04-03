@@ -21,11 +21,11 @@ class Player(Fighter):
     
     # Animation frame counts for different actions
     ANIMATION_FRAMES = {
-        "idle": {"frames": 2, "speed": 10, "does_loop": True},
-        "attack": {"frames": 1, "speed": 5, "does_loop": False},
-        "jump": {"frames": 1, "speed": 1, "does_loop": False},
-        "block": {"frames": 1, "speed": 1, "does_loop": False},
-        "walk": {"frames": 2, "speed": 10, "does_loop": True},
+        "idle": {"frames": 2, "duration": 10, "does_loop": True},
+        "attack": {"frames": 1, "duration": 5, "does_loop": False},
+        "jump": {"frames": 3, "duration": 6, "does_loop": False},
+        "block": {"frames": 1, "duration": 1, "does_loop": False},
+        "walk": {"frames": 5, "duration": 8, "does_loop": True},
     }
     
     def __init__(self, x, color=(50, 100, 255), health=100, strength=12):
@@ -107,11 +107,11 @@ class Player(Fighter):
         if not frames:
             return
         
-        animation_speed = self.ANIMATION_FRAMES[action]["speed"]
+        animation_duration = self.ANIMATION_FRAMES[action]["duration"]
         self.animation_counter += 1
         
-        # Change frame based on animation speed
-        if self.animation_counter >= animation_speed:
+        # Change frame based on animation duration
+        if self.animation_counter >= animation_duration:
             self.animation_counter = 0
             self.animation_frame += 1
             
@@ -121,9 +121,10 @@ class Player(Fighter):
                     # Loop animation
                     self.animation_frame = 0
                 else:
-                    # Non-looping animation: return to idle
-                    self.current_action = "idle" if not self.is_jumping else "jump"
-                    self.animation_frame = 0
+                    # Non-looping animation: stay on last frame unless landing
+                    if not self.is_jumping:
+                        self.current_action = "idle"
+                    self.animation_frame = len(frames) - 1
         
         # Get current frame image
         current_frame_index = min(self.animation_frame, len(frames) - 1)
@@ -182,14 +183,14 @@ class Player(Fighter):
                 self.damage_rect.x = max(0, self.damage_rect.x - self.speed)
                 self.attack_rect.x = max(0, self.attack_rect.x - self.speed)
                 self.facing = 1
-                if self.current_action != "walk":
+                if self.current_action != "walk" and not self.is_jumping:
                     self.set_animation("walk")
                 is_moving = True
             if keys[pygame.K_d]:
                 self.damage_rect.x = min(width - self.damage_rect.width, self.damage_rect.x + self.speed)
                 self.attack_rect.x = min(width - self.attack_rect.width, self.attack_rect.x + self.speed)
                 self.facing = -1
-                if self.current_action != "walk":
+                if self.current_action != "walk" and not self.is_jumping:
                     self.set_animation("walk")
                 is_moving = True
         

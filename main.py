@@ -36,12 +36,22 @@ MAX_FIGHTS = 20
 # --------------------
 # Assets
 # --------------------
-active_background = ["src/old_forest.png", "src/swapped_hills.png", "src/wished_bridge.png", "src/big_castle.png"]
+active_background = ["src/old_forest.png", "src/swapped_hills.jpeg", "src/wished_bridge.png", "src/big_castle.png"]
 
 ult_ui = pygame.image.load("src/ult_ui.png").convert_alpha()
 ult_ui = pygame.transform.scale(ult_ui, (170, 170))
 
+player_health_bar_under = pygame.image.load("src/healthbar_under.png")
+player_health_bar_under = pygame.transform.scale(player_health_bar_under,(450,90))
 
+enemy_health_bar_under = pygame.image.load("src/healthbar_under.png")
+enemy_health_bar_under = pygame.transform.scale(enemy_health_bar_under,(450,90))
+
+player_cooldownbar_under = pygame.image.load("src/cooldownbar_under.png")
+player_cooldownbar_under = pygame.transform.scale(player_cooldownbar_under,(450,90))
+
+enemy_cooldownbar_under = pygame.image.load("src/cooldownbar_under.png")
+enemy_cooldownbar_under = pygame.transform.scale(enemy_cooldownbar_under,(450,90))
 
 try:
     background_img = pygame.image.load(active_background[0]).convert()
@@ -74,8 +84,16 @@ def create_enemy(fight_number):
 
 def draw_ui(player, enemy, fight_number):
     #health bars
+    screen.blit(player_health_bar_under, (285, 710))
+    screen.blit(enemy_health_bar_under, (WIDTH - 735, 710))
+
+    screen.blit(player_cooldownbar_under, (285, 610))
+    screen.blit(enemy_cooldownbar_under, (WIDTH - 735, 610))
+
     pygame.draw.rect(screen, (255,0,0), (310, 725, player.health * 4, 60))
     pygame.draw.rect(screen, (255,0,0), (WIDTH - 310 - enemy.health * 4, 725, enemy.health * 4, 60))
+    
+    
     #cooldown bars
     if player.max_attack_cooldown > 0:
         pygame.draw.rect(screen, (0,255,255), (310, 625, (player.attack_cooldown/(player.max_attack_cooldown)*100) * 4, 60))
@@ -288,6 +306,9 @@ def fight_loop(player, enemy, fight_number):
                 pass
             player.damage_dealt = False
 
+        if player.is_jumping and player.current_attack_type == "Rush Kick" and player.attack_cooldown > 0 and enemy.damage_rect.colliderect(player.attack_rect) and enemy.shield_active:
+            player.velocity_y = 30
+            player.take_damage(0.1)
         if debug_mode:
             draw_debug_info(player, enemy)
         # Floor
