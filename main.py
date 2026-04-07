@@ -1,7 +1,8 @@
 import math
-
+import json
 import pygame
 import sys
+from datetime import datetime
 from modules.player import *
 from modules.enemy import *
 from modules.story import CutsceneManager
@@ -23,6 +24,7 @@ init_mixer()
 clock = pygame.time.Clock()
 font = pygame.font.Font("src/Jacquard24-Regular.ttf", 24)
 bigger_font = pygame.font.Font("src/Jacquard24-Regular.ttf", 48)
+background_img = None
 
 # Initialize cutscene manager
 CutsceneManager.init(screen, clock, font)
@@ -53,12 +55,17 @@ player_cooldownbar_under = pygame.transform.scale(player_cooldownbar_under,(450,
 enemy_cooldownbar_under = pygame.image.load("src/cooldownbar_under.png")
 enemy_cooldownbar_under = pygame.transform.scale(enemy_cooldownbar_under,(450,90))
 
-try:
-    background_img = pygame.image.load(active_background[0]).convert()
-    background_img = pygame.transform.scale(background_img, (WIDTH, HEIGHT))
-except:
-    background_img = None
-    print("Background image not found, using solid color instead.")
+def change_background(i):
+        global background_img
+        print(f"Changing background to index {i}")
+        try:
+            background_img = pygame.image.load(active_background[i]).convert()
+            background_img = pygame.transform.scale(background_img, (WIDTH, HEIGHT))
+        except:
+            background_img = None
+            print(f"Background image (index {i}) not found, using solid color instead.")
+
+change_background(0)  # Start with first background
 
 # --------------------
 # Story / Cutscene
@@ -339,6 +346,111 @@ def fight_loop(player, enemy, fight_number):
     
 
 # --------------------
+# Results Screen
+# --------------------
+
+def save_results(player_name, total_time, total_damage):
+    """Save game results to JSON file"""
+    results = {
+        "player_name": player_name,
+        "time_seconds": total_time,
+        "damage_taken": total_damage,
+        "timestamp": datetime.now().isoformat()
+    }
+    
+    # Load existing results if file exists
+    try:
+        with open("game_results.json", "r") as f:
+            all_results = json.load(f)
+    except:
+        all_results = []
+    
+    # Add new result
+    all_results.append(results)
+    
+    # Save back to file
+    with open("game_results.json", "w") as f:
+        json.dump(all_results, f, indent=2)
+    
+    print(f"Results saved: {player_name}, Time: {total_time}s, Damage: {total_damage}")
+
+
+def results_screen(player, total_time):
+    """Display results screen with name input and submit button"""
+    total_damage = player.max_health - player.health
+    player_name = ""
+    font_small = pygame.font.Font("src/Jacquard24-Regular.ttf", 32)
+    font_large = pygame.font.Font("src/Jacquard24-Regular.ttf", 48)
+    
+    # Button properties
+    button_rect = pygame.Rect(WIDTH // 2 - 100, 500, 200, 60)
+    button_hover = False
+    
+    running = True
+    while running:
+        clock.tick(60)
+        
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+            elif event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_BACKSPACE:
+                    player_name = player_name[:-1]
+                elif event.key == pygame.K_RETURN and len(player_name) > 0:
+                    # Submit
+                    save_results(player_name, int(total_time), int(total_damage))
+                    running = False
+                elif len(player_name) < 10 and event.unicode.isalnum():
+                    player_name += event.unicode
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                if button_rect.collidepoint(event.pos) and len(player_name) > 0:
+                    save_results(player_name, int(total_time), int(total_damage))
+                    running = False
+        
+        # Check button hover
+        mouse_pos = pygame.mouse.get_pos()
+        button_hover = button_rect.collidepoint(mouse_pos)
+        
+        # Draw
+        screen.fill((30, 30, 50))
+        
+        # Title
+        title = font_large.render("Victory!", True, (255, 215, 0))
+        screen.blit(title, (WIDTH // 2 - title.get_width() // 2, 50))
+        
+        # Stats
+        time_text = font_small.render(f"Time: {int(total_time)}s", True, (100, 200, 255))
+        damage_text = font_small.render(f"Damage Taken: {int(total_damage)}", True, (255, 100, 100))
+        screen.blit(time_text, (WIDTH // 2 - time_text.get_width() // 2, 150))
+        screen.blit(damage_text, (WIDTH // 2 - damage_text.get_width() // 2, 220))
+        
+        # Name input label
+        label = font_small.render("Enter Name (max 10 chars):", True, (255, 255, 255))
+        screen.blit(label, (WIDTH // 2 - label.get_width() // 2, 320))
+        
+        # Name input box
+        input_box = pygame.Rect(WIDTH // 2 - 150, 380, 300, 50)
+        pygame.draw.rect(screen, (255, 255, 255), input_box, 2)
+        
+        # Display name with cursor
+        name_display = font_small.render(player_name + "|", True, (255, 255, 255))
+        screen.blit(name_display, (input_box.x + 10, input_box.y + 10))
+        
+        # Submit button
+        button_color = (100, 150, 255) if button_hover else (70, 100, 200)
+        pygame.draw.rect(screen, button_color, button_rect)
+        button_text = font_small.render("Submit", True, (255, 255, 255))
+        screen.blit(button_text, (button_rect.centerx - button_text.get_width() // 2, button_rect.centery - button_text.get_height() // 2))
+        
+        # Instructions
+        instruction = pygame.font.Font("src/Jacquard24-Regular.ttf", 24).render("Press ENTER or click Submit", True, (200, 200, 200))
+        screen.blit(instruction, (WIDTH // 2 - instruction.get_width() // 2, 600))
+        
+        pygame.display.update()
+
+
+# --------------------
 # Main Game
 # --------------------
 
@@ -347,18 +459,30 @@ def main():
 
     player = Player(150)
     global devmode, last_f5_ctrl_state
+    
+    # Track stats
+    start_time = pygame.time.get_ticks() / 1000.0  # Convert to seconds
+    total_time = 0
 
     for fight_number in range(1, MAX_FIGHTS + 1):
+        fight_start_time = pygame.time.get_ticks() / 1000.0
         enemy = create_enemy(fight_number)
         
         if fight_number == 6:
             CutsceneManager.show(3)
+            change_background(1)
         elif fight_number == 11:
             CutsceneManager.show(4)
+            change_background(2)
         elif fight_number == 16:
             CutsceneManager.show(5)
+            change_background(3)
 
         win = fight_loop(player, enemy, fight_number)
+        
+        # Add time from this fight
+        fight_end_time = pygame.time.get_ticks() / 1000.0
+        total_time += (fight_end_time - fight_start_time)
         
         # Reset devmode state for next fight
         devmode = False
@@ -372,6 +496,9 @@ def main():
         player.health = min(player.max_health, player.health + 35)
 
     CutsceneManager.show(6)
+    
+    # Show results screen and save data
+    results_screen(player, total_time)
 
     pygame.quit()
 

@@ -22,7 +22,7 @@ class Player(Fighter):
     # Animation frame counts for different actions
     ANIMATION_FRAMES = {
         "idle": {"frames": 2, "duration": 10, "does_loop": True},
-        "attack": {"frames": 1, "duration": 5, "does_loop": False},
+        "front_kick": {"frames": 6, "duration": 2, "does_loop": False},
         "jump": {"frames": 3, "duration": 6, "does_loop": False},
         "block": {"frames": 1, "duration": 1, "does_loop": False},
         "walk": {"frames": 5, "duration": 8, "does_loop": True},
@@ -68,7 +68,7 @@ class Player(Fighter):
     
     def load_animations(self):
         """Load all animation frames from src folder"""
-        animation_types = ["idle", "attack", "jump", "block", "walk"]
+        animation_types = ["idle", "front_kick", "jump", "block", "walk"]
         
         for anim_type in animation_types:
             self.animations[anim_type] = []
@@ -239,7 +239,8 @@ class Player(Fighter):
             self.damage_delay = int(self.ATTACKS[attack_type]["cooldown"] * 0.66)
             
             # Trigger attack animation
-            self.set_animation("attack")
+            if self.current_attack_type == "Front Kick" or self.current_attack_type == "Rush Kick":
+                self.set_animation("front_kick")
     
     @property
     def image_rect(self):
