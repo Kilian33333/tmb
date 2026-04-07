@@ -38,7 +38,7 @@ MAX_FIGHTS = 20
 # --------------------
 # Assets
 # --------------------
-active_background = ["src/old_forest.png", "src/swapped_hills.jpeg", "src/wished_bridge.png", "src/big_castle.png"]
+active_background = ["src/old_forest.png", "src/swapped_hills.jpeg", "src/wished_bridge.jpeg", "src/big_castle.png"]
 
 ult_ui = pygame.image.load("src/ult_ui.png").convert_alpha()
 ult_ui = pygame.transform.scale(ult_ui, (170, 170))
