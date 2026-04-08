@@ -22,7 +22,7 @@ class Enemy(Fighter):
         "veteran_knight": {"damage_multiplier": 1.5, "resistance": 2.5, "speed_multiplier": 1.0, "crit_chance": 10, "crit_addition": 0.2, "intelligence": "Medium"},
         "elite_knight": {"damage_multiplier": 2.0, "resistance": 3.5, "speed_multiplier": 0.9, "crit_chance": 10, "crit_addition": 0.6, "intelligence": "Medium"},
         "magic_knight": {"damage_multiplier": 2.5, "resistance": 4.5, "speed_multiplier": 1.1, "crit_chance": 15, "crit_addition": 0.6, "intelligence": "High"},
-        "the_king": {"damage_multiplier": 3.0, "resistance": 7.5, "speed_multiplier": 1.0, "crit_chance": 20, "crit_addition": 0.7, "intelligence": "High"},
+        "the_king": {"damage_multiplier": 3.0, "resistance": 6.5, "speed_multiplier": 1.05, "crit_chance": 20, "crit_addition": 0.7, "intelligence": "High"},
     }
     # Attack patterns with damage and symbols
     ATTACKS = {

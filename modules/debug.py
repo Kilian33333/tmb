@@ -22,7 +22,6 @@ def draw_debug_info(player, enemy):
         f"Pos: ({player.damage_rect.x}, {player.damage_rect.y})",
         f"Speed: {player.speed}",
         f"Attack CD: {player.attack_cooldown}",
-        f"Block: {player.block_active}",
         f"Is Jumping: {player.is_jumping}",
         f"Attack Type: {player.current_attack_type}",
         f"Facing: {player.facing}",

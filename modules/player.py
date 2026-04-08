@@ -1,4 +1,4 @@
-"""Player character with multiple attacks and blocking"""
+"""Player character with multiple attacks"""
 import pygame
 import os
 
@@ -24,8 +24,8 @@ class Player(Fighter):
         "idle": {"frames": 2, "duration": 10, "does_loop": True},
         "front_kick": {"frames": 6, "duration": 2, "does_loop": False},
         "jump": {"frames": 3, "duration": 6, "does_loop": False},
-        "block": {"frames": 1, "duration": 1, "does_loop": False},
         "walk": {"frames": 5, "duration": 8, "does_loop": True},
+        "ultimate": {"frames": 30, "duration": 5, "does_loop": False},
     }
     
     def __init__(self, x, color=(50, 100, 255), health=100, strength=12):
@@ -50,10 +50,7 @@ class Player(Fighter):
         self.attack_cooldown = 0
         self.max_attack_cooldown = 0  # Track max for cooldown bar
         self.current_attack_type = "Direct Punch"
-        self.block_active = False
-        self.block_cooldown = 0
         self.resistance = 0.7
-        self.can_block_attacks = ["slash", "thrust", "spin"]
         # Jump mechanics
         self.velocity_y = 0
         self.is_jumping = False
@@ -68,7 +65,7 @@ class Player(Fighter):
     
     def load_animations(self):
         """Load all animation frames from src folder"""
-        animation_types = ["idle", "front_kick", "jump", "block", "walk"]
+        animation_types = ["idle", "front_kick", "jump", "walk", "ultimate"]
         
         for anim_type in animation_types:
             self.animations[anim_type] = []
@@ -158,10 +155,6 @@ class Player(Fighter):
             # Fallback to colored rect if image not loaded
             pygame.draw.rect(screen, self.color, self.damage_rect)
         
-        # Draw block indicator if active
-        if self.block_active:
-            pygame.draw.rect(screen, (100, 200, 100), self.damage_rect, 5)
-        
         # Draw cooldown bar above player
         if self.max_attack_cooldown > 0:
             bar_width = 80
@@ -241,6 +234,9 @@ class Player(Fighter):
             # Trigger attack animation
             if self.current_attack_type == "Front Kick" or self.current_attack_type == "Rush Kick":
                 self.set_animation("front_kick")
+            
+            if self.current_attack_type == "Ultimate":
+                self.set_animation("ultimate")
     
     @property
     def image_rect(self):
@@ -252,26 +248,14 @@ class Player(Fighter):
         img_y = self.damage_rect.y
         return pygame.Rect(img_x, img_y, 198, 198)
     
-    def block(self, keys):
-        """Toggle block (SHIFT key)"""
-        if (keys[pygame.K_LSHIFT] or keys[pygame.K_RSHIFT]) and self.attack_cooldown == 0:
-            self.block_active = True
-            if self.current_action != "block":
-                self.set_animation("block")
-        else:
-            self.block_active = False
-            if self.current_action == "block":
-                self.set_animation("idle")
     
     def take_damage(self, damage, can_block=True):
-        """Take damage with resistance and block chance"""
+        """Take damage with resistance and special damage reduction"""
         # Check if damage is frozen (after enemy dies)
         if self.damage_freeze_timer > 0:
             return self.health
         
-        if self.block_active and can_block:
-            damage = int(damage * 0.3)
-        elif self.resist:
+        if self.resist:
             damage = int(damage * 0.1)
         
         actual_damage = int(damage * self.resistance)
@@ -285,8 +269,6 @@ class Player(Fighter):
             self.attack_cooldown -= 1
             if hasattr(self, 'damage_delay') and self.attack_cooldown == self.damage_delay:
                 self.damage_dealt = True
-        if self.block_cooldown > 0:
-            self.block_cooldown -= 1
         if self.damage_freeze_timer > 0:
             self.damage_freeze_timer -= 1
         

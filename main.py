@@ -145,7 +145,6 @@ def fight_loop(player, enemy, fight_number):
         # Player
         player.move(keys, WIDTH, FLOOR_Y)
         player.apply_gravity(FLOOR_Y)
-        player.block(keys)
 
         # Enemy
         enemy.apply_gravity(FLOOR_Y)
@@ -205,21 +204,20 @@ def fight_loop(player, enemy, fight_number):
                 debug.toggle_hitboxes(False)
 
 
-        if player.block_active == False:
-            if keys[pygame.K_q] and not player.is_jumping:
-                player.attack(enemy, "Front Kick")
-            if keys[pygame.K_q] and player.is_jumping:
-                player.attack(enemy, "Rush Kick")
-            if keys[pygame.K_e]:
-                player.attack(enemy, "High Kick") and not player.is_jumping
-            if keys[pygame.K_r]:
-                player.attack(enemy, "Upward swing")
-            if keys[pygame.K_c]:
-                player.attack(enemy, "Side head strike")
-            if keys[pygame.K_x]:
-                player.attack(enemy, "Direct Punch")        
-            if keys[pygame.K_f] and player.ultimate_charge == 100:
-                player.attack(enemy, "Ultimate")
+        if keys[pygame.K_q] and not player.is_jumping:
+            player.attack(enemy, "Front Kick")
+        if keys[pygame.K_q] and player.is_jumping:
+            player.attack(enemy, "Rush Kick")
+        if keys[pygame.K_e]:
+            player.attack(enemy, "High Kick") and not player.is_jumping
+        if keys[pygame.K_r]:
+            player.attack(enemy, "Upward swing")
+        if keys[pygame.K_c]:
+            player.attack(enemy, "Side head strike")
+        if keys[pygame.K_x]:
+            player.attack(enemy, "Direct Punch")        
+        if keys[pygame.K_f] and player.ultimate_charge == 100:
+            player.attack(enemy, "Ultimate")
             
 
         def knockback( given_to, knockback_strength, shockwave):
@@ -401,7 +399,7 @@ def results_screen(player, total_time):
                     # Submit
                     save_results(player_name, int(total_time), int(total_damage))
                     running = False
-                elif len(player_name) < 10 and event.unicode.isalnum():
+                elif len(player_name) < 15 and event.unicode.isalnum():
                     player_name += event.unicode
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 if button_rect.collidepoint(event.pos) and len(player_name) > 0:
@@ -426,7 +424,7 @@ def results_screen(player, total_time):
         screen.blit(damage_text, (WIDTH // 2 - damage_text.get_width() // 2, 220))
         
         # Name input label
-        label = font_small.render("Enter Name (max 10 chars):", True, (255, 255, 255))
+        label = font_small.render("Enter Name (max 15 chars):", True, (255, 255, 255))
         screen.blit(label, (WIDTH // 2 - label.get_width() // 2, 320))
         
         # Name input box
@@ -455,19 +453,16 @@ def results_screen(player, total_time):
 # --------------------
 
 def main():
-    CutsceneManager.show(1)
+    CutsceneManager.show(1)  # Story intro (not counted)
 
     player = Player(150)
     global devmode, last_f5_ctrl_state
     
-    # Track stats
-    start_time = pygame.time.get_ticks() / 1000.0  # Convert to seconds
+    # Track stats - only count fight time, not cutscenes
     total_time = 0
 
     for fight_number in range(1, MAX_FIGHTS + 1):
-        fight_start_time = pygame.time.get_ticks() / 1000.0
-        enemy = create_enemy(fight_number)
-        
+        # Cutscenes happen BEFORE timing starts
         if fight_number == 6:
             CutsceneManager.show(3)
             change_background(1)
@@ -478,9 +473,13 @@ def main():
             CutsceneManager.show(5)
             change_background(3)
 
+        # NOW start timing the fight
+        enemy = create_enemy(fight_number)
+        fight_start_time = pygame.time.get_ticks() / 1000.0
+        
         win = fight_loop(player, enemy, fight_number)
         
-        # Add time from this fight
+        # End timing after fight completes
         fight_end_time = pygame.time.get_ticks() / 1000.0
         total_time += (fight_end_time - fight_start_time)
         
@@ -495,9 +494,10 @@ def main():
 
         player.health = min(player.max_health, player.health + 35)
 
-    CutsceneManager.show(6)
+    CutsceneManager.show(6)  # Story ending (not counted)
     
-    # Show results screen and save data
+    # Show results screen and save data (only fight time)
+
     results_screen(player, total_time)
 
     pygame.quit()
