@@ -4,6 +4,7 @@ from main import main
 from modules.screenSet import *
 from modules.music import play_menu_music
 from modules.splash import splash
+from guides import *
 
 pygame.init()
 
@@ -113,7 +114,9 @@ while running:
                 if action == "start":
                     pygame.mixer.music.stop()
                     main()
-                    running = False
+                    play_menu_music()
+                elif action == "guides":
+                    guides()
                 elif action == "quit":
                     running = False
 

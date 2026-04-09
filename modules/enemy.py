@@ -20,7 +20,7 @@ class Enemy(Fighter):
         "heavy_recruits": {"damage_multiplier": 1.0, "resistance": 1.5, "speed_multiplier": 1.0, "crit_chance": 5, "crit_addition": 0.05, "intelligence": "Low"},
         "heavy_knight": {"damage_multiplier": 1.0, "resistance": 2.0, "speed_multiplier": 1.0, "crit_chance": 5, "crit_addition": 0.15, "intelligence": "Medium"},
         "veteran_knight": {"damage_multiplier": 1.5, "resistance": 2.5, "speed_multiplier": 1.0, "crit_chance": 10, "crit_addition": 0.2, "intelligence": "Medium"},
-        "elite_knight": {"damage_multiplier": 2.0, "resistance": 3.5, "speed_multiplier": 0.9, "crit_chance": 10, "crit_addition": 0.6, "intelligence": "Medium"},
+        "elite_knight": {"damage_multiplier": 2.5, "resistance": 3.5, "speed_multiplier": 0.9, "crit_chance": 10, "crit_addition": 0.6, "intelligence": "High"},
         "magic_knight": {"damage_multiplier": 2.5, "resistance": 4.5, "speed_multiplier": 1.1, "crit_chance": 15, "crit_addition": 0.6, "intelligence": "High"},
         "the_king": {"damage_multiplier": 3.0, "resistance": 6.5, "speed_multiplier": 1.05, "crit_chance": 20, "crit_addition": 0.7, "intelligence": "High"},
     }

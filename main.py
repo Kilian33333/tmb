@@ -489,8 +489,7 @@ def main():
 
         if not win:
             CutsceneManager.show(2)
-            pygame.quit()
-            sys.exit()
+            return None  # Game over, exit main loop
 
         player.health = min(player.max_health, player.health + 35)
 
@@ -499,8 +498,6 @@ def main():
     # Show results screen and save data (only fight time)
 
     results_screen(player, total_time)
-
-    pygame.quit()
 
 
 
