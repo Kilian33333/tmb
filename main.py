@@ -240,7 +240,7 @@ def fight_loop(player, enemy, fight_number):
                         enemy.damage_rect.y = max(0, enemy.damage_rect.y - knockback_strength/3)
                         enemy.attack_rect.x = max(0, enemy.attack_rect.x - knockback_strength*-1)
                         enemy.attack_rect.y = max(0, enemy.attack_rect.y - knockback_strength/3)
-                    enemy.take_damage(int(200 / math.log((abs(player.x - enemy.x)/3) + 2)))
+                    enemy.take_damage(int(430 / math.log((abs(player.x - enemy.x)/3) + 2)))
                 else:
                     if not enemy.shield_active:
                         enemy.damage_rect.x = max(0, enemy.damage_rect.x - knockback_strength*player.facing)

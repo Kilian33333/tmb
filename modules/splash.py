@@ -28,8 +28,8 @@ credits = [
     ["Artwork:", "Kilian D.", "Background and Character Art:", "Jannis S."],
     ["Special Thanks:", "Alen K.", "Moritz G."]
 ]
-credit_display_duration = 360  # frames to show each credit
-credit_fade_duration = 45  # frames for fade in/out
+credit_display_duration = 330  # frames to show each credit
+credit_fade_duration = 30  # frames for fade in/out
 credit_cycle_tick = 0
 
 # Collect all asset files and python scripts
@@ -50,7 +50,7 @@ def collect_files():
     return files
 
 loading_files = collect_files()
-frames_per_file = 17
+frames_per_file = 3
 
 # returns the current loading file and progress percentage
 def get_loading_info(current_tick, display_duration):
