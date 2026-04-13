@@ -118,6 +118,7 @@ while running:
                 elif action == "guides":
                     guides()
                 elif action == "quit":
+                    
                     running = False
 
     pygame.display.flip()

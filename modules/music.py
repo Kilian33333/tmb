@@ -31,6 +31,18 @@ def play_menu_music():
     except Exception as e:
         print(f"Normal music error: {e}")
 
+def play_mid_fight_music():
+    global current_music
+    try:
+        path = os.path.join("src", "mid_fight_music.wav")
+        pygame.mixer.music.load(path)
+        pygame.mixer.music.set_volume(0.6)
+        pygame.mixer.music.play(-1)
+        current_music = "third_fight"
+        print(f"Playing third fight music: {path}")
+    except Exception as e:
+        print(f"Third fight music error: {e}")
+
 def stop_music():
     pygame.mixer.music.stop()
     current_music = None

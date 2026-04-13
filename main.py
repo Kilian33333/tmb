@@ -133,8 +133,7 @@ def fight_loop(player, enemy, fight_number):
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                pygame.quit()
-                sys.exit()
+                return None  
 
         # Background
         if background_img:
@@ -185,7 +184,7 @@ def fight_loop(player, enemy, fight_number):
             elif keys[pygame.K_1]:
                 enemy.take_damage(100)
             elif keys[pygame.K_2]:
-                player.take_damage(666)
+                player.take_damage(666) # 👹
             elif keys[pygame.K_3]:
                 player.health = player.max_health
             elif keys[pygame.K_4]:
@@ -466,12 +465,14 @@ def main():
         if fight_number == 6:
             CutsceneManager.show(3)
             change_background(1)
+            play_mid_fight_music()
         elif fight_number == 11:
             CutsceneManager.show(4)
             change_background(2)
         elif fight_number == 16:
             CutsceneManager.show(5)
             change_background(3)
+            play_boss_music()
 
         # NOW start timing the fight
         enemy = create_enemy(fight_number)
