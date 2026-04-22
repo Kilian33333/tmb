@@ -5,6 +5,9 @@ from modules.screenSet import *
 from modules.music import play_menu_music
 from modules.splash import splash
 from guides import *
+from modules.sounds import *
+from modules.settings_ui import settings_menu
+from modules.settings_manager import load_settings
 
 pygame.init()
 
@@ -12,9 +15,10 @@ pygame.display.set_caption("Main Menu")
 
 menu_button_font = pygame.font.Font("src/Jacquard24-Regular.ttf", 60)
 
-start_button_rect = pygame.Rect(screen.get_width() / 2 - 160, screen.get_height() / 2 + 160, 200, 70)
-guides_button_rect = pygame.Rect(screen.get_width() / 2 + 40, screen.get_height() / 2 + 160, 200, 70)
-quit_button_rect = pygame.Rect(screen.get_width() / 2 + 240, screen.get_height() / 2 + 160, 200, 70)
+start_button_rect = pygame.Rect(screen.get_width() / 2 - 260, screen.get_height() / 2 + 160, 200, 70)
+guides_button_rect = pygame.Rect(screen.get_width() / 2 - 40, screen.get_height() / 2 + 160, 200, 70)
+settings_button_rect = pygame.Rect(screen.get_width() / 2 + 180, screen.get_height() / 2 + 160, 200, 70)
+quit_button_rect = pygame.Rect(screen.get_width() / 2 + 400, screen.get_height() / 2 + 160, 200, 70)
 
 play_menu_music()
 background_image_original = pygame.image.load("src/knight_loading_screen.png").convert_alpha()
@@ -32,6 +36,7 @@ underline_image = pygame.image.load("src/underline_hover.png").convert_alpha()
 menu_guides = [
     {"rect": start_button_rect, "text": "Start", "blink": True, "action": "start"},
     {"rect": guides_button_rect, "text": "Guides", "blink": False, "action": "guides"},
+    {"rect": settings_button_rect, "text": "Settings", "blink": False, "action": "settings"},
     {"rect": quit_button_rect, "text": "Quit", "blink": False, "action": "quit"}
 ]
 selected_index = 0
@@ -105,22 +110,34 @@ while running:
         if event.type == pygame.QUIT:
             running = False
         elif event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_LEFT or event.key == pygame.K_UP:
+
+            if event.key == pygame.K_LEFT:
                 selected_index = (selected_index - 1) % len(menu_guides)
-            elif event.key == pygame.K_RIGHT or event.key == pygame.K_DOWN:
+            elif event.key == pygame.K_RIGHT:
                 selected_index = (selected_index + 1) % len(menu_guides)
             elif event.key == pygame.K_RETURN:
                 action = menu_guides[selected_index]["action"]
+                play_sound("click", pan=0, volume=1.0)
                 if action == "start":
                     pygame.mixer.music.stop()
                     main()
                     play_menu_music()
                 elif action == "guides":
                     guides()
+                elif action == "settings":
+                    settings_menu()
+                    load_settings()  # Reload settings in case they changed
                 elif action == "quit":
-                    
                     running = False
-
+            if event.key == pygame.K_LEFT or event.key == pygame.K_RIGHT:
+                if menu_guides[selected_index]["action"] == "start":
+                    play_sound("hover", pan=-70, volume=0.5)
+                elif menu_guides[selected_index]["action"] == "guides":
+                    play_sound("hover", pan=-30, volume=0.5)
+                elif menu_guides[selected_index]["action"] == "settings":
+                    play_sound("hover", pan=30, volume=0.5)
+                elif menu_guides[selected_index]["action"] == "quit":
+                    play_sound("hover", pan=70, volume=0.5)
     pygame.display.flip()
 
 pygame.quit()

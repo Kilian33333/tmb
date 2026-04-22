@@ -381,4 +381,3 @@ class Enemy(Fighter):
             self.shield_active = True
             self.shield_duration = self.max_shield_duration
             self.shield_cooldown = self.max_shield_cooldown
-    

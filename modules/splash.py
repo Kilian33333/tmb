@@ -1,5 +1,4 @@
 import pygame
-import glob
 
 from modules.screenSet import screen
 
@@ -36,21 +35,11 @@ credit_cycle_tick = 0
 def collect_files():
     files = []
 
-    # Get all python scripts & asset files
-    py_files = glob.glob("**/*.py", recursive=True)
-    files.extend([f"Loading {f}" for f in py_files])
-    asset_patterns = ["**/*.png", "**/*.ttf", "**/*.wav"]
-    for pattern in asset_patterns:
-        asset_files = glob.glob(pattern, recursive=True)
-        files.extend([f"Loading {f}" for f in asset_files])
-
-    files.extend([""]) # hi kilian if you leave this empty the progress text will
-                       # disappear when loading is complete, if you want you can put
-                       # something like "waiting for player" here :)
+    files.extend(["load Pictures", "Adjusting Gravity", "Forge armor", "Recruiting Knights", "Draw Menu and Starting..."])
     return files
 
 loading_files = collect_files()
-frames_per_file = 3
+frames_per_file = 35
 
 # returns the current loading file and progress percentage
 def get_loading_info(current_tick, display_duration):

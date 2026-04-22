@@ -26,6 +26,10 @@ class Player(Fighter):
         "jump": {"frames": 3, "duration": 6, "does_loop": False},
         "walk": {"frames": 5, "duration": 8, "does_loop": True},
         "ultimate": {"frames": 30, "duration": 5, "does_loop": False},
+        "punch": {"frames": 2, "duration": 3, "does_loop": False},
+        "headSideStrike": {"frames": 5, "duration": 10, "does_loop": False},
+        "upward_swing": {"frames": 12, "duration": 8, "does_loop": False},
+        "high_kick": {"frames": 5, "duration": 5, "does_loop": False},
     }
     
     def __init__(self, x, color=(50, 100, 255), health=100, strength=12):
@@ -65,7 +69,7 @@ class Player(Fighter):
     
     def load_animations(self):
         """Load all animation frames from src folder"""
-        animation_types = ["idle", "front_kick", "jump", "walk", "ultimate"]
+        animation_types = ["idle", "front_kick", "jump", "walk", "ultimate", "punch", "headSideStrike", "upward_swing", "high_kick"]
         
         for anim_type in animation_types:
             self.animations[anim_type] = []
@@ -171,7 +175,7 @@ class Player(Fighter):
     def move(self, keys, width, floor_y):
         """Move player with keyboard input and jumping"""
         is_moving = False
-        if self.attack_cooldown == 0 or self.current_attack_type == "Direct Punch":
+        if self.attack_cooldown == 0:
             if keys[pygame.K_a]:
                 self.damage_rect.x = max(0, self.damage_rect.x - self.speed)
                 self.attack_rect.x = max(0, self.attack_rect.x - self.speed)
@@ -237,6 +241,19 @@ class Player(Fighter):
             
             if self.current_attack_type == "Ultimate":
                 self.set_animation("ultimate")
+            
+            if self.current_attack_type == "Direct Punch":
+                self.set_animation("punch")
+
+            if self.current_attack_type == "Side head strike":
+                self.set_animation("headSideStrike")
+            
+            if self.current_attack_type == "Upward swing":
+                self.set_animation("upward_swing")
+
+            if self.current_attack_type == "High Kick":
+                self.set_animation("high_kick")
+
     
     @property
     def image_rect(self):

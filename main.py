@@ -9,12 +9,15 @@ from modules.story import CutsceneManager
 from modules.screenSet import *
 from modules.debug import draw_debug_info, debug_mode
 from modules.music import *
-
+from modules.sounds import *
+from modules.pause_menu import pause_menu
+from modules.settings_manager import load_settings
 
 
 # --------------------
 # Setup
 # --------------------
+player_sound_pan = 0.0
 
 devmode = False
 
@@ -28,6 +31,9 @@ background_img = None
 
 # Initialize cutscene manager
 CutsceneManager.init(screen, clock, font)
+
+# Load settings
+load_settings()
 
 WIDTH = screen.get_width()
 HEIGHT = screen.get_height()
@@ -130,10 +136,20 @@ def fight_loop(player, enemy, fight_number):
         clock.tick(60)
         keys = pygame.key.get_pressed()
         
+        #pan value based on player position, -100 (left) to +100 (right)
+        player_sound_pan = ((player.damage_rect.centerx / WIDTH) - 0.5) * 200
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                return None  
+                return None
+            elif event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    pause_result = pause_menu()
+                    if pause_result == "menu":
+                        return None  # Break fight loop and go to menu
+                    elif pause_result == "quit":
+                        return None  # Break and quit
+                    # resume does nothing, fight continues
 
         # Background
         if background_img:
@@ -336,6 +352,12 @@ def fight_loop(player, enemy, fight_number):
             return True
         if player.health <= 0:
             return False
+        
+        # --------------------
+        # Sound Effects
+        # --------------------
+        if player.current_attack_type == "Ultimate" and player.attack_cooldown == round(player.max_attack_cooldown*0.99):
+            play_sound("ultimate", pan=player_sound_pan, volume=1.0)
 
         # --------------------
         # Debug Mode
@@ -386,7 +408,7 @@ def results_screen(player, total_time):
     running = True
     while running:
         clock.tick(60)
-        
+
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
