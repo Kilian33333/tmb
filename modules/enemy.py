@@ -30,6 +30,17 @@ class Enemy(Fighter):
         "smash": {"damage": 12, "cooldown": 80, "symbol": "↓", "telegraph_time": 30},
         "thrust": {"damage": 10, "cooldown": 120, "symbol": "→", "telegraph_time": 28},
     }
+
+    ANIMATION_FRAMES = {
+        "idle": {"frames": 3, "duration": 8, "does_loop": True},
+        "walk": {"frames": 3, "duration": 6, "does_loop": True},
+        "jump": {"frames": 2, "duration": 4, "does_loop": False},
+        "slash": {"frames": 4, "duration": 5, "does_loop": False},
+        "smash": {"frames": 5, "duration": 5, "does_loop": False},
+        "thrust": {"frames": 4, "duration": 5, "does_loop": False},
+        "shield": {"frames": 1, "duration": 1, "does_loop": True}
+        
+    }
     
     def __init__(self, x, color, health=100, strength=12, fight_number=1):
         super().__init__(x, color, health, strength)
@@ -84,9 +95,22 @@ class Enemy(Fighter):
         
         # AI action tracking
         self.current_action = "idle"
+        
+        # Animation system
+        self.animations = {}  # Store all loaded animations
+        self._current_animation = "idle"  # Current animation being played
+        self.animation_frame = 0  # Current frame index
+        self.animation_counter = 0  # Counter for frame timing
+        self.image = None
 
         # Scale difficulty
         self._scale_difficulty()
+        
+        # Load all animations after difficulty scaling
+        self.load_animations()
+        
+        # Set initial animation
+        self.set_animation("idle")
     
     def _scale_difficulty(self):
         """Scale stats based on fight number and stage multipliers"""
@@ -104,9 +128,100 @@ class Enemy(Fighter):
         
         # Behavior multipliers
     
+    def load_animations(self):
+        """Load all animation frames from stage-specific folders"""
+        animation_types = ["idle", "walk", "jump", "slash", "smash", "thrust", "shield"]
+        
+        for anim_type in animation_types:
+            self.animations[anim_type] = []
+            frame_count = self.ANIMATION_FRAMES[anim_type]["frames"]
+            
+            # Try to load frames for this animation from stage folder
+            for frame_num in range(frame_count):
+                filename = f"src/{self.stage_name}/enemy_{anim_type}_{frame_num}.png"
+                try:
+                    if os.path.exists(filename):
+                        img = pygame.image.load(filename).convert_alpha()
+                        img = pygame.transform.scale(img, (140, 160))
+                        self.animations[anim_type].append(img)
+                    else:
+                        print(f"Animation frame not found: {filename}")
+                except Exception as e:
+                    print(f"Error loading {filename}: {e}")
+            
+            # If no frames loaded, use a placeholder
+            if not self.animations[anim_type]:
+                print(f"Warning: No frames loaded for {anim_type} animation in {self.stage_name}")
+                self.animations[anim_type] = [None]
+        
+        # Set initial image
+        if self.animations["idle"]:
+            self.image = self.animations["idle"][0]
+    
+    def update_animation(self):
+        """Update animation frame based on current animation"""
+        # Use _current_animation if set, otherwise use current_action
+        action = getattr(self, '_current_animation', self.current_action)
+        
+        if action not in self.animations:
+            return
+        
+        frames = self.animations[action]
+        if not frames:
+            return
+        
+        animation_duration = self.ANIMATION_FRAMES[action]["duration"]
+        self.animation_counter += 1
+        
+        # Change frame based on animation duration
+        if self.animation_counter >= animation_duration:
+            self.animation_counter = 0
+            self.animation_frame += 1
+            
+            # Loop animation or stop at last frame
+            if self.animation_frame >= len(frames):
+                if self.ANIMATION_FRAMES[action]["does_loop"]:
+                    # Loop animation
+                    self.animation_frame = 0
+                else:
+                    # Non-looping animation: stay on last frame unless landing
+                    if not self.is_jumping:
+                        self._current_animation = "idle"
+                    self.animation_frame = len(frames) - 1
+        
+        # Get current frame image
+        current_frame_index = min(self.animation_frame, len(frames) - 1)
+        if frames[current_frame_index]:
+            self.image = frames[current_frame_index]
+    
+    def set_animation(self, action):
+        """Set the current animation action - separate from AI action"""
+        # Always reset frame counters when animation is set
+        self.animation_frame = 0
+        self.animation_counter = 0
+        
+        # Store the animation name (may differ from current_action for movement)
+        self._current_animation = action
+    
     def draw(self, screen):
-        """Draw enemy with health bar and attack telegraph"""
-        pygame.draw.rect(screen, self.color, self.damage_rect)
+        """Draw enemy with animation, health bar and attack telegraph"""
+        # Draw enemy image based on facing direction
+        if self.image:
+            img_to_draw = self.image
+            # facing == -1 means facing right, facing == 1 means facing left
+            if self.facing == -1:  # Facing right, character on right side of image
+                self.attack_rect.x = self.damage_rect.x - (45)
+                img_x = self.damage_rect.x - (40/2)
+            else:  # Facing left (facing == 1), image extends left, flip image
+                img_x = self.damage_rect.x
+                img_to_draw = pygame.transform.flip(self.image, True, False)
+                self.attack_rect.x = self.damage_rect.x
+            
+            img_y = self.damage_rect.y
+            screen.blit(img_to_draw, (img_x, img_y))
+        else:
+            # Fallback to colored rect if image not loaded
+            pygame.draw.rect(screen, self.color, self.damage_rect)
         
         # Draw shield if active
         if self.shield_active:
@@ -267,29 +382,38 @@ class Enemy(Fighter):
         if self.decision_timer <= 0:
             player_state = self._get_player_state(target)
             weights = self._calculate_action_weights(player_state)
-            self.current_action = self._choose_action(weights)
+            new_action = self._choose_action(weights)
             self.decision_timer = 30
+            
+            # Update action and animation if it changed
+            if new_action != self.current_action:
+                self.current_action = new_action
+                # Map movement actions to walk animation
+                if new_action in ["move_towards", "move_away"]:
+                    self.set_animation("walk")
+                else:
+                    self.set_animation(new_action)
         
-        # Execute the chosen action
+        # Execute the chosen action based on current_action
         if self.current_action == "move_towards":
             if distance > 0:
                 self.damage_rect.x += self.speed
                 self.attack_rect.x += self.speed
-                self.facing = -1
+                self.facing = 1
             else:
                 self.damage_rect.x -= self.speed
                 self.attack_rect.x -= self.speed
-                self.facing = 1
+                self.facing = -1
         
         elif self.current_action == "move_away":
             if distance > 0:
                 self.damage_rect.x -= self.speed
                 self.attack_rect.x -= self.speed
-                self.facing = 1
+                self.facing = -1
             else:
                 self.damage_rect.x += self.speed
                 self.attack_rect.x += self.speed
-                self.facing = -1
+                self.facing = 1
         
         elif self.current_action == "jump":
             self.jump()
@@ -301,6 +425,9 @@ class Enemy(Fighter):
             if self.attack_cooldown == 0:  # Only attack when not in cooldown
                 attack_type = random.choice(list(self.ATTACKS.keys()))
                 self._prepare_attack(attack_type)
+                # Set animation for the attack
+                self.set_animation(attack_type)
+        
         
         # Keep enemy in bounds
         self.damage_rect.x = max(0, min(width - self.damage_rect.width, self.damage_rect.x))
@@ -340,6 +467,9 @@ class Enemy(Fighter):
     
     def update(self):
         """Update cooldowns and timers"""
+        # Update animation
+        self.update_animation()
+        
         if self.attack_cooldown > 0:
             self.attack_cooldown -= 1
         if self.telegraph_cooldown > 0:

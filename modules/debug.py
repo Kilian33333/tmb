@@ -9,7 +9,7 @@ def draw_debug_info(player, enemy):
     """Draw organized debug information on screen (Minecraft F3 style)"""
     font = pygame.font.SysFont("consolas", 12)  # Consolas monospace font
     line_height = 14
-    green = (0, 255, 0)  # Bright green
+    green = (0, 0, 0) 
     
     # Screen dimensions for positioning
     width = screen.get_width()

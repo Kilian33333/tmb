@@ -24,7 +24,7 @@ credits = [
     ["Main-Development:", "Kilian D."],
     ["Programming:", "Kilian D.", "Co.Programming:", "Jannis S."],
     ["Music by:", "Kilian D.","Mixing:", "Alen K."],
-    ["Artwork:", "Kilian D.", "Background and Character Art:", "Jannis S."],
+    ["Main-Artwork:", "Kilian D.", "Background and Character Art:", "Jannis S.", "Kilian D.", "Moritz G."],
     ["Special Thanks:", "Alen K.", "Moritz G."]
 ]
 credit_display_duration = 330  # frames to show each credit
