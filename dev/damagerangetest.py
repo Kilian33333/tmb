@@ -1,6 +1,6 @@
 import math
 while 1:
-    i=100
+    i=1000
     base = int(input("Base:"))
     while i > 0:
         i -= 1

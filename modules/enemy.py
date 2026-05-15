@@ -32,9 +32,9 @@ class Enemy(Fighter):
     }
 
     ANIMATION_FRAMES = {
-        "idle": {"frames": 3, "duration": 8, "does_loop": True},
+        "idle": {"frames": 2, "duration": 8, "does_loop": True},
         "walk": {"frames": 3, "duration": 6, "does_loop": True},
-        "jump": {"frames": 2, "duration": 4, "does_loop": False},
+        #"jump": {"frames": 2, "duration": 4, "does_loop": False},
         "slash": {"frames": 4, "duration": 5, "does_loop": False},
         "smash": {"frames": 5, "duration": 5, "does_loop": False},
         "thrust": {"frames": 4, "duration": 5, "does_loop": False},
@@ -130,7 +130,7 @@ class Enemy(Fighter):
     
     def load_animations(self):
         """Load all animation frames from stage-specific folders"""
-        animation_types = ["idle", "walk", "jump", "slash", "smash", "thrust", "shield"]
+        animation_types = ["idle", "walk", "slash", "smash", "thrust", "shield"]
         
         for anim_type in animation_types:
             self.animations[anim_type] = []

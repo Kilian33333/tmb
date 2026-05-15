@@ -44,7 +44,7 @@ MAX_FIGHTS = 20
 # --------------------
 # Assets
 # --------------------
-active_background = ["src/old_forest.png", "src/swapped_hills.jpeg", "src/wished_bridge.jpeg", "src/big_castle.png"]
+active_background = ["src/old_forest.png", "src/swapped_hills.jpeg", "src/wished_bridge.jpeg", "src/big_castle.jpg"]
 
 ult_ui = pygame.image.load("src/ult_ui.png").convert_alpha()
 ult_ui = pygame.transform.scale(ult_ui, (170, 170))
@@ -95,7 +95,36 @@ def create_enemy(fight_number):
     return Enemy(650, color, health=100, strength=strength, fight_number=fight_number)
 
 
-def draw_ui(player, enemy, fight_number):
+class DamageIndicator:
+    """Floating damage number that fades and moves up"""
+    def __init__(self, x, y, damage, color=(255, 255, 255)):
+        self.x = x
+        self.y = y
+        self.damage = damage
+        self.color = color
+        self.alpha = 255
+        self.lifetime = 60  # frames
+        self.age = 0
+    
+    def update(self):
+        self.age += 1
+        self.y -= 2  # Move up
+        self.alpha = int(255 * (1 - self.age / self.lifetime))
+    
+    def draw(self, surface, font):
+        if self.alpha > 0:
+            damage_text = font.render(str(int(self.damage)), True, self.color)
+            # Create a surface with alpha for fading effect
+            text_surface = pygame.Surface(damage_text.get_size(), pygame.SRCALPHA)
+            text_surface.blit(damage_text, (0, 0))
+            text_surface.set_alpha(self.alpha)
+            surface.blit(text_surface, (int(self.x), int(self.y)))
+    
+    def is_alive(self):
+        return self.age < self.lifetime
+
+
+def draw_ui(player, enemy, fight_number, damage_indicators):
     #health bars
     screen.blit(player_health_bar_under, (285, 710))
     screen.blit(enemy_health_bar_under, (WIDTH - 735, 710))
@@ -127,9 +156,25 @@ def draw_ui(player, enemy, fight_number):
     txt = bigger_font.render(f"Fight {fight_number}/{MAX_FIGHTS}", True, (255,255,255))
     screen.blit(txt, (WIDTH/2-txt.get_width()/2, 20))
 
+    # Damage taken in this moment, calculated from enemys damage, checking if player has taken damage recently and detecting and calculating if shield is used in enemys case
+    #player_active_taken_damage = enemy.current_attack_damage if enemy.current_attack_type and enemy.attack_cooldown > round(enemy.max_attack_cooldown*0.65) and enemy.attack_rect.colliderect(player.damage_rect) and not player.resist else 0
+    #if enemy.current_attack_type and enemy.attack_cooldown > round(enemy.max_attack_cooldown*0.65) and enemy.attack_rect.colliderect(player.damage_rect) and player.resist:
+    #    player_active_taken_damage = int(enemy.current_attack_damage * 0.3) # shield reduces damage to 30%
+
+    # Add damage indicator when player takes damage
+    #if player_active_taken_damage > 0 and not hasattr(player, '_damage_indicator_shown') or not player._damage_indicator_shown:
+    #    damage_indicators.append(DamageIndicator(player.damage_rect.centerx, player.damage_rect.centery - 50, player_active_taken_damage, color=(255, 100, 100)))
+    #    player._damage_indicator_shown = True
+    #elif player_active_taken_damage == 0:
+    #    player._damage_indicator_shown = False
+
+    #player_damage_label = font.render(f"Damage Taken: {player_active_taken_damage}", True, (255, 100, 100))
+    #screen.blit(player_damage_label, (20, 20))
+
 
 def fight_loop(player, enemy, fight_number):
     running = True
+    damage_indicators = []  # List to store active damage indicators
 
     while running:
         
@@ -255,7 +300,7 @@ def fight_loop(player, enemy, fight_number):
                         enemy.damage_rect.y = max(0, enemy.damage_rect.y - knockback_strength/3)
                         enemy.attack_rect.x = max(0, enemy.attack_rect.x - knockback_strength*-1)
                         enemy.attack_rect.y = max(0, enemy.attack_rect.y - knockback_strength/3)
-                    enemy.take_damage(int(430 / math.log((abs(player.x - enemy.x)/3) + 2)))
+                    enemy.take_damage(int(480 / math.log((abs(player.x - enemy.x)/3) + 2)))
                 else:
                     if not enemy.shield_active:
                         enemy.damage_rect.x = max(0, enemy.damage_rect.x - knockback_strength*player.facing)
@@ -322,6 +367,8 @@ def fight_loop(player, enemy, fight_number):
             if player.attack_rect.colliderect(enemy.damage_rect):
                 damage = player.ATTACKS[player.current_attack_type]["damage"]
                 enemy.take_damage(damage)
+                # Add damage indicator for enemy
+                damage_indicators.append(DamageIndicator(enemy.damage_rect.centerx, enemy.damage_rect.centery, f"-{damage}", color=(255, 0, 0)))
             else:
                 pass
             player.damage_dealt = False
@@ -329,8 +376,13 @@ def fight_loop(player, enemy, fight_number):
         if player.is_jumping and player.current_attack_type == "Rush Kick" and player.attack_cooldown > 0 and enemy.damage_rect.colliderect(player.attack_rect) and enemy.shield_active:
             player.velocity_y = 30
             player.take_damage(0.1)
-        if debug_mode:
-            draw_debug_info(player, enemy)
+        
+        # Update and draw damage indicators
+        for indicator in damage_indicators[:]:
+            indicator.update()
+            if not indicator.is_alive():
+                damage_indicators.remove(indicator)
+        
         # Floor
         pygame.draw.rect(screen, (80, 60, 40), (0, FLOOR_Y, WIDTH, HEIGHT - FLOOR_Y))
 
@@ -343,7 +395,13 @@ def fight_loop(player, enemy, fight_number):
         player.draw(screen)
         enemy.draw(screen)
 
-        draw_ui(player, enemy, fight_number)
+        # Draw damage indicators
+        for indicator in damage_indicators:
+            indicator.draw(screen, bigger_font)
+        if debug_mode:
+            draw_debug_info(player, enemy)
+
+        draw_ui(player, enemy, fight_number, damage_indicators)
 
         pygame.display.update()
 
