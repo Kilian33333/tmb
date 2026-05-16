@@ -1,7 +1,7 @@
 """Player character with multiple attacks"""
 import pygame
 import os
-
+from modules import vfx
 from modules import screenSet
 from .fighter import Fighter
 screen = screenSet.screen
@@ -274,6 +274,8 @@ class Player(Fighter):
         
         if self.resist:
             damage = int(damage * 0.1)
+        
+        vfx.draw_status_pictures("player_hit")
         
         actual_damage = int(damage * self.resistance)
         if damage > 0 and actual_damage == 0:

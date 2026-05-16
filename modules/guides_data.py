@@ -1,5 +1,9 @@
 guides_data = [
     {
+        "title": "Demo",
+        "content": ["This is a demo guide. It doesn't have any real content, just some placeholder text or pre written phrases to show how the guides work.", "", "You can navigate through the guides using the UP and DOWN arrow keys, and press ENTER to select one.", "", "The content of each guide is displayed on the right side of the screen when selected.", "", "This demo guide is meant to be replaced with actual guides that provide useful information about the game.", "", "Feel free to explore the other guides for more details!"]
+    },
+    {
         "title": "First Words",
         "content": [
             "Hi, my name is Kilian. Before you start playing or reading the guides,",
@@ -152,7 +156,7 @@ guides_data = [
             "  Fight     19: Magic Knight. 2.5x damage, extreme resistance,",
             "                fastest enemy in the game.",
             "  Fight     20: THE KING. 3x damage, highest resistance,",
-            "                20% crit chance, brutal bonus damage. Purple.",
+            "                20% crit chance, brutal bonus damage.",
 
             "RECORDS AND HALL OF FAME",
             "Beat all 20 fights and you reach the victory screen.",
@@ -184,12 +188,8 @@ guides_data = [
     },
     {
         "title":"Behind the Scenes",
-           "content": ["Thats me, Kilian and my Gituar, composing music that you hear in this Game.<behind_the_scenes_kilian_1>"
-            "",
-            "e",
-            "e",
-        "jhlkhjj",
-        "<behind_the_scenes_kilian_2>mjb"]
+           "content": ["Thats me, Kilian and my Gituar, composing music that you hear in this Game.<behind_the_scenes_kilian_1>",
+            "<behind_the_scenes_kilian_2>"]
     },
     {
         "title": "Credits",

@@ -12,6 +12,7 @@ from modules.music import *
 from modules.sounds import *
 from modules.pause_menu import pause_menu
 from modules.settings_manager import load_settings
+from modules.vfx import draw_status_pictures
 
 
 # --------------------
@@ -181,6 +182,7 @@ def fight_loop(player, enemy, fight_number):
         clock.tick(60)
         keys = pygame.key.get_pressed()
         
+
         #pan value based on player position, -100 (left) to +100 (right)
         player_sound_pan = ((player.damage_rect.centerx / WIDTH) - 0.5) * 200
 
@@ -367,6 +369,7 @@ def fight_loop(player, enemy, fight_number):
             if player.attack_rect.colliderect(enemy.damage_rect):
                 damage = player.ATTACKS[player.current_attack_type]["damage"]
                 enemy.take_damage(damage)
+                draw_status_pictures("enemy_hit")
                 # Add damage indicator for enemy
                 damage_indicators.append(DamageIndicator(enemy.damage_rect.centerx, enemy.damage_rect.centery, f"-{damage}", color=(255, 0, 0)))
             else:
@@ -402,11 +405,13 @@ def fight_loop(player, enemy, fight_number):
             draw_debug_info(player, enemy)
 
         draw_ui(player, enemy, fight_number, damage_indicators)
+        draw_status_pictures()
 
         pygame.display.update()
 
         if enemy.health <= 0:
             player.damage_freeze_timer = 20  # Freeze damage for 20 ticks after enemy dies
+            draw_status_pictures("enemy_destroyed")
             return True
         if player.health <= 0:
             return False
