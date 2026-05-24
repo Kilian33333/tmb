@@ -35,10 +35,9 @@ class Enemy(Fighter):
         "idle": {"frames": 2, "duration": 8, "does_loop": True},
         "walk": {"frames": 3, "duration": 6, "does_loop": True},
         #"jump": {"frames": 2, "duration": 4, "does_loop": False},
-        "slash": {"frames": 4, "duration": 5, "does_loop": False},
+        "slash": {"frames": 5, "duration": 5, "does_loop": False},
         "smash": {"frames": 5, "duration": 5, "does_loop": False},
-        "thrust": {"frames": 4, "duration": 5, "does_loop": False},
-        "shield": {"frames": 1, "duration": 1, "does_loop": True}
+        "thrust": {"frames": 2, "duration": 5, "does_loop": False},#
         
     }
     
@@ -109,6 +108,15 @@ class Enemy(Fighter):
         # Load all animations after difficulty scaling
         self.load_animations()
         
+        # Load shield image
+        self.shield_image = None
+        try:
+            if os.path.exists("src/shield.png"):
+                self.shield_image = pygame.image.load("src/shield.png").convert_alpha()
+                self.shield_image = pygame.transform.scale(self.shield_image, (125, 90))
+        except Exception as e:
+            print(f"Error loading shield image: {e}")
+        
         # Set initial animation
         self.set_animation("idle")
     
@@ -130,7 +138,7 @@ class Enemy(Fighter):
     
     def load_animations(self):
         """Load all animation frames from stage-specific folders"""
-        animation_types = ["idle", "walk", "slash", "smash", "thrust", "shield"]
+        animation_types = ["idle", "walk", "slash", "smash", "thrust"]
         
         for anim_type in animation_types:
             self.animations[anim_type] = []
@@ -223,10 +231,6 @@ class Enemy(Fighter):
             # Fallback to colored rect if image not loaded
             pygame.draw.rect(screen, self.color, self.damage_rect)
         
-        # Draw shield if active
-        if self.shield_active:
-            pygame.draw.rect(screen, (100, 150, 255), self.damage_rect, 3)
-        
         if self.telegraph_cooldown > 0 and self.incoming_attack_symbol:
             font = pygame.font.SysFont("arial", 40)
             symbol_surf = font.render(self.incoming_attack_symbol, True, (255, 100, 0))
@@ -243,6 +247,15 @@ class Enemy(Fighter):
             progress = max(0, self.telegraph_cooldown) / self.ATTACKS[self.incoming_attack]["telegraph_time"]
             pygame.draw.rect(screen, (100, 200, 100), (bar_x, bar_y, bar_width * progress, bar_height))
     
+    def draw_shield(self, screen):
+        """Draw shield if active - should be called after background but before floor"""
+        if self.shield_active:
+            if self.shield_image:
+                shield_x = self.damage_rect.centerx - self.shield_image.get_width() // 2
+                shield_y = self.damage_rect.centery - self.shield_image.get_height() // 2
+                screen.blit(self.shield_image, (shield_x, shield_y))
+            else:
+                pygame.draw.rect(screen, (100, 150, 255), self.damage_rect, 3)
 
 #---------------------------------------------
 #           +++Movement Algorythm+++
@@ -459,6 +472,9 @@ class Enemy(Fighter):
                 print("Enemy landed a normal hit.")
                 damage = int(self.ATTACKS[attack_type]["damage"] * self.damage_multiplier)
             target.take_damage(damage, can_block=True)
+            # Track cumulative damage dealt to player
+            if hasattr(target, 'total_damage_taken'):
+                target.total_damage_taken += damage
     
     def take_damage(self, damage, can_block=False):
         """Take damage from player"""

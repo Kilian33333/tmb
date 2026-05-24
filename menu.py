@@ -21,7 +21,7 @@ settings_button_rect = pygame.Rect(screen.get_width() / 2 + 180, screen.get_heig
 quit_button_rect = pygame.Rect(screen.get_width() / 2 + 400, screen.get_height() / 2 + 160, 200, 70)
 
 play_menu_music()
-background_image_original = pygame.image.load("src/knight_loading_screen.png").convert_alpha()
+background_image_original = pygame.image.load("src/knight_loading_screen_d.png").convert_alpha()
 bg_original_width = background_image_original.get_width()
 bg_original_height = background_image_original.get_height()
 screen_height = screen.get_height()

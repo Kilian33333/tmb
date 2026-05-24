@@ -3,6 +3,7 @@ import sys
 from modules.screenSet import *
 from modules.music import play_menu_music
 import json
+import math
 import re
 from modules.months import MONTHS
 from modules.guides_data import guides_data, MEDAL_COLORS, MEDAL_NAMES
@@ -49,11 +50,11 @@ def format_timestamp(timestamp_str):
         return timestamp_str
 
 
-def bubble_sort_time(records):
+def tim_sort_time(records):
     return sorted(records, key=lambda r: (r["time_seconds"], r["damage_taken"]))
 
 
-def bubble_sort_damage(records):
+def tim_sort_damage(records):
     return sorted(records, key=lambda r: (r["damage_taken"], r["time_seconds"]))
 
 
@@ -70,7 +71,7 @@ def load_data():
 
 def get_top_10_time():
     data = load_data()
-    sorted_data = bubble_sort_time(data)
+    sorted_data = tim_sort_time(data)
     top_10 = sorted_data[:10]
 
     if not top_10:
@@ -80,15 +81,16 @@ def get_top_10_time():
     for i, r in enumerate(top_10, start=1):
         medal = MEDAL_NAMES.get(i, "")
         color = MEDAL_COLORS.get(i, GRAY)
+        time_score = int(200 - ( 100 * math.pow(r['time_seconds'] / 370, 3))) if int(r['time_seconds']) < 370 else int(100 - math.pow((r['time_seconds'] - 370) / 370, 3))
         formatted_time = format_timestamp(r.get('timestamp', ''))
-        text = f"{r['player_name']} - {r['time_seconds']}s"
+        text = f"{r['player_name']} - {r['time_seconds']}s  - Score: {time_score}"
         result.append({"medal": medal, "rank": str(i), "text": text, "timestamp": formatted_time, "color": color})
     return result
 
 
 def get_top_10_damage():
     data = load_data()
-    sorted_data = bubble_sort_damage(data)
+    sorted_data = tim_sort_damage(data)
     top_10 = sorted_data[:10]
 
     if not top_10:
@@ -98,9 +100,44 @@ def get_top_10_damage():
     for i, r in enumerate(top_10, start=1):
         medal = MEDAL_NAMES.get(i, "")
         color = MEDAL_COLORS.get(i, GRAY)
+        dmg_score = int(200 - ( 100 * math.pow(r['damage_taken'] / 640, 3))) if int(r['damage_taken']) < 640 else int(100 - (100 * math.pow((r['damage_taken'] - 640) / 640, 3)))
         formatted_time = format_timestamp(r.get('timestamp', ''))
-        text = f"{r['player_name']} - DMG: {r['damage_taken']}"
+        text = f"{r['player_name']} - DMG: {r['damage_taken']} - Score: {dmg_score}"
         result.append({"medal": medal, "rank": str(i), "text": text, "timestamp": formatted_time, "color": color})
+    return result
+
+
+def get_top_10_total_score():
+    data = load_data()
+    
+    if not data:
+        return [{"medal": "", "rank": "", "text": "No records yet", "color": GRAY}]
+    
+    # Calculate total scores for each record
+    records_with_scores = []
+    for r in data:
+        time_score = int(200 - ( 100 * math.pow(r['time_seconds'] / 370, 3))) if int(r['time_seconds']) < 370 else int(100 - math.pow((r['time_seconds'] - 370) / 370, 3))
+        dmg_score = int(200 - ( 100 * math.pow(r['damage_taken'] / 640, 3))) if int(r['damage_taken']) < 640 else int(100 - (100 * math.pow((r['damage_taken'] - 640) / 640, 3)))
+        total_score = time_score + dmg_score
+        records_with_scores.append({
+            **r,
+            "time_score": time_score,
+            "dmg_score": dmg_score,
+            "total_score": total_score
+        })
+    
+    # Sort by total score descending (highest first)
+    sorted_data = sorted(records_with_scores, key=lambda r: r["total_score"], reverse=True)
+    top_10 = sorted_data[:10]
+    
+    result = []
+    for i, r in enumerate(top_10, start=1):
+        medal = MEDAL_NAMES.get(i, "")
+        color = MEDAL_COLORS.get(i, GRAY)
+        formatted_time = format_timestamp(r.get('timestamp', ''))
+        text = f"{r['player_name']} - Total Score: {r['total_score']}"
+        result.append({"medal": medal, "rank": str(i), "text": text, "timestamp": formatted_time, "color": color})
+    
     return result
 
 # -------------------------------
@@ -246,75 +283,144 @@ def guides():
         
         # HALL OF FAME (SPECIAL VIEW)
         if current_guide["title"] == "Best Players":
+            # Best Players has 2 pages
+            best_players_total_pages = 2
+            best_players_current_page = min(current_page, best_players_total_pages - 1)
+            
+            if best_players_current_page == 0:
+                # Page 1: Fastest Times and Lowest Damage
+                left_list = get_top_10_time()
+                right_list = get_top_10_damage()
 
-            left_list = get_top_10_time()
-            right_list = get_top_10_damage()
+                left_title = guide_content_font.render("FASTEST TIMES", True, WHITE)
+                right_title = guide_content_font.render("LOWEST DAMAGE", True, WHITE)
 
-            left_title = guide_content_font.render("FASTEST TIMES", True, WHITE)
-            right_title = guide_content_font.render("LOWEST DAMAGE", True, WHITE)
+                screen.blit(left_title, (380, 150))
+                screen.blit(right_title, (850, 150))
 
-            screen.blit(left_title, (380, 150))
-            screen.blit(right_title, (850, 150))
+                pygame.draw.line(screen, WHITE, (800, 50), (800, 650), 2)
 
-            pygame.draw.line(screen, WHITE, (800, 50), (800, 650), 2)
+                y_offset = 210
+                for entry in left_list:
+                    medal_text = f"{entry['medal']}" if entry['medal'] else ""
+                    rank_text = f"#{entry['rank']}" if entry['rank'] else ""
+                    main_text = entry['text']
+                    timestamp_text = entry.get('timestamp', '')
 
-            y_offset = 210
-            for entry in left_list:
-                medal_text = f"{entry['medal']}" if entry['medal'] else ""
-                rank_text = f"#{entry['rank']}" if entry['rank'] else ""
-                main_text = entry['text']
-                timestamp_text = entry.get('timestamp', '')
+                    if medal_text:
+                        medal_surface = guide_content_font.render(medal_text, True, entry['color'])
+                        medal_bg = pygame.Surface((110, 35))
+                        medal_bg.fill(entry['color'])
+                        medal_bg.set_alpha(40)
+                        screen.blit(medal_bg, (385, y_offset+5))
+                        medal_num = guide_content_font.render(rank_text, True, entry['color'])
+                        screen.blit(medal_num, (340, y_offset))
+                        screen.blit(medal_surface, (385, y_offset))
 
-                if medal_text:
-                    medal_surface = guide_content_font.render(medal_text, True, entry['color'])
-                    medal_bg = pygame.Surface((110, 35))
-                    medal_bg.fill(entry['color'])
-                    medal_bg.set_alpha(40)
-                    screen.blit(medal_bg, (385, y_offset+5))
-                    medal_num = guide_content_font.render(rank_text, True, entry['color'])
-                    screen.blit(medal_num, (340, y_offset))
-                    screen.blit(medal_surface, (385, y_offset))
+                        text_surface = guide_content_font.render(main_text, True, entry['color'])
+                        screen.blit(text_surface, (500, y_offset))
 
-                    text_surface = guide_content_font.render(main_text, True, entry['color'])
-                    screen.blit(text_surface, (500, y_offset))
+                        if timestamp_text:
+                            timestamp_surface = pygame.font.Font("src/Jacquard24-Regular.ttf", 25).render(timestamp_text, True, GRAY)
+                            screen.blit(timestamp_surface, (500, y_offset + 25))
+                    else:
+                        text_surface = guide_content_font.render(main_text, True, GRAY)
+                        screen.blit(text_surface, (480, y_offset))
 
-                    if timestamp_text:
-                        timestamp_surface = pygame.font.Font("src/Jacquard24-Regular.ttf", 25).render(timestamp_text, True, GRAY)
-                        screen.blit(timestamp_surface, (500, y_offset + 25))
-                else:
-                    text_surface = guide_content_font.render(main_text, True, GRAY)
-                    screen.blit(text_surface, (480, y_offset))
+                    y_offset += 50
 
-                y_offset += 50
+                y_offset = 210
+                for entry in right_list:
+                    medal_text = f"{entry['medal']}" if entry['medal'] else ""
+                    rank_text = f"#{entry['rank']}" if entry['rank'] else ""
+                    main_text = entry['text']
+                    timestamp_text = entry.get('timestamp', '')
 
-            y_offset = 210
-            for entry in right_list:
-                medal_text = f"{entry['medal']}" if entry['medal'] else ""
-                rank_text = f"#{entry['rank']}" if entry['rank'] else ""
-                main_text = entry['text']
-                timestamp_text = entry.get('timestamp', '')
+                    if medal_text:
+                        medal_surface = guide_content_font.render(medal_text, True, entry['color'])
+                        medal_num = guide_content_font.render(rank_text, True, entry['color'])
+                        medal_bg = pygame.Surface((110, 35))
+                        medal_bg.fill(entry['color'])
+                        medal_bg.set_alpha(40)
+                        screen.blit(medal_bg, (855, y_offset+5))
+                        screen.blit(medal_num, (810, y_offset))
+                        screen.blit(medal_surface, (855, y_offset))
 
-                if medal_text:
-                    medal_surface = guide_content_font.render(medal_text, True, entry['color'])
-                    medal_num = guide_content_font.render(rank_text, True, entry['color'])
-                    medal_bg = pygame.Surface((110, 35))
-                    medal_bg.fill(entry['color'])
-                    medal_bg.set_alpha(40)
-                    screen.blit(medal_bg, (855, y_offset+5))
-                    screen.blit(medal_num, (810, y_offset))
-                    screen.blit(medal_surface, (855, y_offset))
+                        text_surface = guide_content_font.render(main_text, True, entry['color'])
+                        screen.blit(text_surface, (970, y_offset))
 
-                    text_surface = guide_content_font.render(main_text, True, entry['color'])
-                    screen.blit(text_surface, (970, y_offset))
+                        if timestamp_text:
+                            timestamp_surface = pygame.font.Font("src/Jacquard24-Regular.ttf", 25).render(timestamp_text, True, GRAY)
+                            screen.blit(timestamp_surface, (970, y_offset + 25))
+                    else:
+                        text_surface = guide_content_font.render(main_text, True, GRAY)
+                        screen.blit(text_surface, (850, y_offset))
 
-                    if timestamp_text:
-                        timestamp_surface = pygame.font.Font("src/Jacquard24-Regular.ttf", 25).render(timestamp_text, True, GRAY)
-                        screen.blit(timestamp_surface, (970, y_offset + 25))
-                else:
-                    text_surface = guide_content_font.render(main_text, True, GRAY)
-                    screen.blit(text_surface, (850, y_offset))
+                    y_offset += 50
+            
+            else:
+                # Page 2: Highest Total Scores
+                total_list = get_top_10_total_score()
+                
+                title = guide_content_font.render("HIGHEST TOTAL SCORES", True, WHITE)
+                screen.blit(title, (500, 150))
+                
+                y_offset = 210
+                for entry in total_list:
+                    medal_text = f"{entry['medal']}" if entry['medal'] else ""
+                    rank_text = f"#{entry['rank']}" if entry['rank'] else ""
+                    main_text = entry['text']
+                    timestamp_text = entry.get('timestamp', '')
 
-                y_offset += 50
+                    if medal_text:
+                        medal_surface = guide_content_font.render(medal_text, True, entry['color'])
+                        medal_bg = pygame.Surface((110, 35))
+                        medal_bg.fill(entry['color'])
+                        medal_bg.set_alpha(40)
+                        screen.blit(medal_bg, (480, y_offset+5))
+                        medal_num = guide_content_font.render(rank_text, True, entry['color'])
+                        screen.blit(medal_num, (435, y_offset))
+                        screen.blit(medal_surface, (480, y_offset))
+
+                        text_surface = guide_content_font.render(main_text, True, entry['color'])
+                        screen.blit(text_surface, (595, y_offset))
+
+                        if timestamp_text:
+                            timestamp_surface = pygame.font.Font("src/Jacquard24-Regular.ttf", 25).render(timestamp_text, True, GRAY)
+                            screen.blit(timestamp_surface, (595, y_offset + 25))
+                    else:
+                        text_surface = guide_content_font.render(main_text, True, GRAY)
+                        screen.blit(text_surface, (480, y_offset))
+
+                    y_offset += 50
+            
+            # Draw page indicator and navigation buttons for Best Players
+            pages_y_position = screen.get_height() - 60
+            page_text = guide_small_font.render(f"Page {best_players_current_page + 1} / {best_players_total_pages}", True, WHITE)
+            page_text_rect = page_text.get_rect(center=(screen.get_width() // 2, pages_y_position))
+            screen.blit(page_text, page_text_rect)
+            
+            # Left arrow button
+            left_arrow_rect = pygame.Rect(380, pages_y_position - 20, 40, 40)
+            if best_players_current_page > 0:
+                pygame.draw.rect(screen, WHITE, left_arrow_rect, 2)
+                arrow_left = guide_small_font.render("<", True, WHITE)
+            else:
+                pygame.draw.rect(screen, GRAY, left_arrow_rect, 1)
+                arrow_left = guide_small_font.render("<", True, GRAY)
+            arrow_left_rect = arrow_left.get_rect(center=left_arrow_rect.center)
+            screen.blit(arrow_left, arrow_left_rect)
+            
+            # Right arrow button
+            right_arrow_rect = pygame.Rect(screen.get_width() - 100, pages_y_position - 20, 40, 40)
+            if best_players_current_page < best_players_total_pages - 1:
+                pygame.draw.rect(screen, WHITE, right_arrow_rect, 2)
+                arrow_right = guide_small_font.render(">", True, WHITE)
+            else:
+                pygame.draw.rect(screen, GRAY, right_arrow_rect, 1)
+                arrow_right = guide_small_font.render(">", True, GRAY)
+            arrow_right_rect = arrow_right.get_rect(center=right_arrow_rect.center)
+            screen.blit(arrow_right, arrow_right_rect)
 
         else:
             content_x = 400
@@ -501,15 +607,25 @@ def guides():
                     selected_index = (selected_index + 1) % len(guides_data)
                     play_sound("hover", pan=-40, volume=0.5)
                 elif event.key == pygame.K_LEFT:
-                    # Only allow left navigation on non-special guides
-                    if current_guide["title"] not in ["Best Players", "Behind the Scenes"]:
+                    if current_guide["title"] == "Best Players":
+                        # Best Players has pagination support
+                        if current_page > 0:
+                            current_page -= 1
+                        play_sound("turn_page", pan=-40, volume=0.8)
+                    elif current_guide["title"] != "Behind the Scenes":
+                        # Other guides have pagination support
                         pages, total_pages = get_page_content(current_guide["content"])
                         if current_page > 0:
                             current_page -= 1
                         play_sound("turn_page", pan=-40, volume=0.8)
                 elif event.key == pygame.K_RIGHT:
-                    # Only allow right navigation on non-special guides
-                    if current_guide["title"] not in ["Best Players", "Behind the Scenes"]:
+                    if current_guide["title"] == "Best Players":
+                        # Best Players has 2 pages
+                        if current_page < 1:
+                            current_page += 1
+                        play_sound("turn_page", pan=40, volume=0.8)
+                    elif current_guide["title"] != "Behind the Scenes":
+                        # Other guides have pagination support
                         pages, total_pages = get_page_content(current_guide["content"])
                         if current_page < total_pages - 1:
                             current_page += 1

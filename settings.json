@@ -1,6 +1,6 @@
 {
-  "music_volume": 0,
-  "sound_effects_volume": 120,
+  "music_volume": 50,
+  "sound_effects_volume": 40,
   "particle_intensity": 100,
   "screen_type": 0
 }

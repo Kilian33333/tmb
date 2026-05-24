@@ -75,6 +75,7 @@ def draw_debug_info(player, enemy):
         f"FPS: 60",
         f"Screen: {width}x{height}",
         f"P Damage: {getattr(player, 'damage_dealt', False)}",
+        f"Total Dmg Taken: {int(getattr(player, 'total_damage_taken', 0))}",
     ]
     y_offset = height - 70
     for i, line in enumerate(game_info):

@@ -1,14 +1,26 @@
 [
   {
-    "player_name": "KILIAN1Dev",
-    "time_seconds": 354,
-    "damage_taken": 48,
-    "timestamp": "2026-04-08T00:49:31.977536"
+    "player_name": "Kilian1Dev",
+    "time_seconds": 344,
+    "damage_taken": 466,
+    "timestamp": "2026-05-19T23:30:06.750544"
   },
   {
-    "player_name": "KILIAN1DEV",
-    "time_seconds": 369,
-    "damage_taken": 60,
-    "timestamp": "2026-05-12T18:54:45.037222"
+    "player_name": "Kilian1Dev",
+    "time_seconds": 367,
+    "damage_taken": 398,
+    "timestamp": "2026-05-20T00:58:32.271575"
+  },
+  {
+    "player_name": "Kilian1Dev",
+    "time_seconds": 407,
+    "damage_taken": 429,
+    "timestamp": "2026-05-20T11:43:55.215821"
+  },
+  {
+    "player_name": "moritz",
+    "time_seconds": 373,
+    "damage_taken": 604,
+    "timestamp": "2026-05-20T12:05:29.182241"
   }
 ]

@@ -28,6 +28,7 @@ init_mixer()
 clock = pygame.time.Clock()
 font = pygame.font.Font("src/Jacquard24-Regular.ttf", 24)
 bigger_font = pygame.font.Font("src/Jacquard24-Regular.ttf", 48)
+clean_font = pygame.font.Font("Dancing_Script/static/DancingScript-Bold.ttf", 20)
 background_img = None
 
 # Initialize cutscene manager
@@ -130,18 +131,18 @@ def draw_ui(player, enemy, fight_number, damage_indicators):
     screen.blit(player_health_bar_under, (285, 710))
     screen.blit(enemy_health_bar_under, (WIDTH - 735, 710))
 
-    screen.blit(player_cooldownbar_under, (285, 610))
-    screen.blit(enemy_cooldownbar_under, (WIDTH - 735, 610))
+    #screen.blit(player_cooldownbar_under, (285, 610))
+    #screen.blit(enemy_cooldownbar_under, (WIDTH - 735, 610))
 
     pygame.draw.rect(screen, (255,0,0), (310, 725, player.health * 4, 60))
     pygame.draw.rect(screen, (255,0,0), (WIDTH - 310 - enemy.health * 4, 725, enemy.health * 4, 60))
     
     
-    #cooldown bars
-    if player.max_attack_cooldown > 0:
-        pygame.draw.rect(screen, (0,255,255), (310, 625, (player.attack_cooldown/(player.max_attack_cooldown)*100) * 4, 60))
-    if enemy.max_attack_cooldown > 0:
-        pygame.draw.rect(screen, (0,255,255), (WIDTH - 310 -  (enemy.attack_cooldown/(enemy.max_attack_cooldown)*100) * 4, 625, (enemy.attack_cooldown/(enemy.max_attack_cooldown+0.0001)*100) * 4, 60))
+    ##cooldown bars
+    #if player.max_attack_cooldown > 0:
+    #    pygame.draw.rect(screen, (0,255,255), (310, 625, (player.attack_cooldown/(player.max_attack_cooldown)*100) * 4, 60))
+    #if enemy.max_attack_cooldown > 0:
+    #    pygame.draw.rect(screen, (0,255,255), (WIDTH - 310 -  (enemy.attack_cooldown/(enemy.max_attack_cooldown)*100) * 4, 625, (enemy.attack_cooldown/(enemy.max_attack_cooldown+0.0001)*100) * 4, 60))
 
     #circle with ult ui image
     ult_color = (255, 0, 0) 
@@ -156,6 +157,9 @@ def draw_ui(player, enemy, fight_number, damage_indicators):
 
     txt = bigger_font.render(f"Fight {fight_number}/{MAX_FIGHTS}", True, (255,255,255))
     screen.blit(txt, (WIDTH/2-txt.get_width()/2, 20))
+
+    fighter_name = clean_font.render(f"Enemy: {enemy.stage_name.replace('_', ' ').upper()}", True, (255,255,255))
+    screen.blit(fighter_name, (WIDTH/2-fighter_name.get_width()/2, 80))
 
     # Damage taken in this moment, calculated from enemys damage, checking if player has taken damage recently and detecting and calculating if shield is used in enemys case
     #player_active_taken_damage = enemy.current_attack_damage if enemy.current_attack_type and enemy.attack_cooldown > round(enemy.max_attack_cooldown*0.65) and enemy.attack_rect.colliderect(player.damage_rect) and not player.resist else 0
@@ -176,6 +180,7 @@ def draw_ui(player, enemy, fight_number, damage_indicators):
 def fight_loop(player, enemy, fight_number):
     running = True
     damage_indicators = []  # List to store active damage indicators
+    pause_time = 0  # Track total pause time
 
     while running:
         
@@ -188,14 +193,17 @@ def fight_loop(player, enemy, fight_number):
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                return None
+                return None, pause_time
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
+                    pause_start = pygame.time.get_ticks() / 1000.0
                     pause_result = pause_menu()
+                    pause_end = pygame.time.get_ticks() / 1000.0
+                    pause_time += (pause_end - pause_start)
                     if pause_result == "menu":
-                        return None  # Break fight loop and go to menu
+                        return None, pause_time  # Break fight loop and go to menu
                     elif pause_result == "quit":
-                        return None  # Break and quit
+                        return None, pause_time  # Break and quit
                     # resume does nothing, fight continues
 
         # Background
@@ -203,6 +211,9 @@ def fight_loop(player, enemy, fight_number):
             screen.blit(background_img, (0, 0))
         else:
             screen.fill((60, 120, 180))
+        
+        # Draw shield (behind floor and player, but not background)
+        enemy.draw_shield(screen)
 
         # Player
         player.move(keys, WIDTH, FLOOR_Y)
@@ -378,7 +389,9 @@ def fight_loop(player, enemy, fight_number):
 
         if player.is_jumping and player.current_attack_type == "Rush Kick" and player.attack_cooldown > 0 and enemy.damage_rect.colliderect(player.attack_rect) and enemy.shield_active:
             player.velocity_y = 30
-            player.take_damage(0.1)
+            damage_taken = 0.1
+            player.take_damage(damage_taken)
+            player.total_damage_taken += damage_taken
         
         # Update and draw damage indicators
         for indicator in damage_indicators[:]:
@@ -412,9 +425,9 @@ def fight_loop(player, enemy, fight_number):
         if enemy.health <= 0:
             player.damage_freeze_timer = 20  # Freeze damage for 20 ticks after enemy dies
             draw_status_pictures("enemy_destroyed")
-            return True
+            return True, pause_time
         if player.health <= 0:
-            return False
+            return False, pause_time
         
         # --------------------
         # Sound Effects
@@ -459,7 +472,7 @@ def save_results(player_name, total_time, total_damage):
 
 def results_screen(player, total_time):
     """Display results screen with name input and submit button"""
-    total_damage = player.max_health - player.health
+    total_damage = player.total_damage_taken
     player_name = ""
     font_small = pygame.font.Font("src/Jacquard24-Regular.ttf", 32)
     font_large = pygame.font.Font("src/Jacquard24-Regular.ttf", 48)
@@ -540,6 +553,7 @@ def main():
     CutsceneManager.show(1)  # Story intro (not counted)
 
     player = Player(150)
+    player.total_damage_taken = 0  # Track cumulative damage taken
     global devmode, last_f5_ctrl_state
     
     # Track stats - only count fight time, not cutscenes
@@ -563,11 +577,13 @@ def main():
         enemy = create_enemy(fight_number)
         fight_start_time = pygame.time.get_ticks() / 1000.0
         
-        win = fight_loop(player, enemy, fight_number)
+        win, pause_time = fight_loop(player, enemy, fight_number)
         
         # End timing after fight completes
         fight_end_time = pygame.time.get_ticks() / 1000.0
-        total_time += (fight_end_time - fight_start_time)
+        fight_duration = fight_end_time - fight_start_time
+        # Subtract pause time from total
+        total_time += (fight_duration - pause_time)
         
         # Reset devmode state for next fight
         devmode = False
