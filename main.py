@@ -129,13 +129,13 @@ class DamageIndicator:
 def draw_ui(player, enemy, fight_number, damage_indicators):
     #health bars
     screen.blit(player_health_bar_under, (285, 710))
-    screen.blit(enemy_health_bar_under, (WIDTH - 735, 710))
+    screen.blit(enemy_health_bar_under, (WIDTH - 635, 710))
 
     #screen.blit(player_cooldownbar_under, (285, 610))
     #screen.blit(enemy_cooldownbar_under, (WIDTH - 735, 610))
 
     pygame.draw.rect(screen, (255,0,0), (310, 725, player.health * 4, 60))
-    pygame.draw.rect(screen, (255,0,0), (WIDTH - 310 - enemy.health * 4, 725, enemy.health * 4, 60))
+    pygame.draw.rect(screen, (255,0,0), (WIDTH - 210 - enemy.health * 4, 725, enemy.health * 4, 60))
     
     
     ##cooldown bars
