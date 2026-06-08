@@ -1,6 +1,7 @@
 import pygame
 import sys
 from pathlib import Path
+from modules.screenSet import update_display
 
 
 class CutsceneManager:
@@ -139,6 +140,6 @@ class CutsceneManager:
                 rect = surf.get_rect(center=(cls.screen.get_width() // 2, y_offset + i * 40))
                 cls.screen.blit(surf, rect)
 
-        pygame.display.update()
+        update_display()
 
 

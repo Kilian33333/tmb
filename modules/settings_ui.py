@@ -1,6 +1,6 @@
 """Settings menu interface"""
 import pygame
-from modules.screenSet import screen, WHITE, GRAY, BLACK
+from modules.screenSet import screen, WHITE, GRAY, BLACK, update_display
 from modules.settings_manager import get_settings, set_setting
 from modules.music import update_music_volume
 
@@ -26,7 +26,7 @@ SETTINGS_ITEMS = [
     {"name": "music_volume", "label": "Music Volume", "min": 0, "max": 120, "step": 10, "display": "%"},
     {"name": "sound_effects_volume", "label": "Sound Effects", "min": 0, "max": 120, "step": 10, "display": "%"},
     {"name": "particle_intensity", "label": "Particle Effects", "min": 0, "max": 100, "step": 10, "display": "%"},
-    {"name": "screen_type", "label": "Screen Type", "type": "enum", "options": ["Fullscreen", "Window"]},
+    {"name": "screen_type", "label": "Screen Type", "type": "enum", "options": ["Fullscreen", "arcade","Window"]},
 ]
 
 def draw_slider(y_pos, label, value, min_val, max_val, is_selected, is_editing, display_suffix=""):
@@ -187,6 +187,6 @@ def settings_menu():
                         new_value = min(item["max"], current_value + step)
                         setting_values[item["name"]] = new_value
         
-        pygame.display.flip()
+        update_display()
     
     return True

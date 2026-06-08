@@ -7,6 +7,7 @@ from modules.player import *
 from modules.enemy import *
 from modules.story import CutsceneManager
 from modules.screenSet import *
+from modules.screenSet import update_display
 from modules.debug import draw_debug_info, debug_mode
 from modules.music import *
 from modules.sounds import *
@@ -420,7 +421,7 @@ def fight_loop(player, enemy, fight_number):
         draw_ui(player, enemy, fight_number, damage_indicators)
         draw_status_pictures()
 
-        pygame.display.update()
+        update_display()
 
         if enemy.health <= 0:
             player.damage_freeze_timer = 20  # Freeze damage for 20 ticks after enemy dies
@@ -542,7 +543,7 @@ def results_screen(player, total_time):
         instruction = pygame.font.Font("src/Jacquard24-Regular.ttf", 24).render("Press ENTER or click Submit", True, (200, 200, 200))
         screen.blit(instruction, (WIDTH // 2 - instruction.get_width() // 2, 600))
         
-        pygame.display.update()
+        update_display()
 
 
 # --------------------

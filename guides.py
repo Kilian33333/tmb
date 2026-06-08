@@ -1,6 +1,7 @@
 import pygame
 import sys
 from modules.screenSet import *
+from modules.screenSet import update_display
 from modules.music import play_menu_music
 import json
 import math
@@ -637,4 +638,4 @@ def guides():
                     elif selected_index == len(guides_data) - 1:
                         return
 
-        pygame.display.flip()
+        update_display()

@@ -1,13 +1,13 @@
 import pygame
 
-from modules.screenSet import screen
+from modules.screenSet import screen, update_display
 
 tick = 0
 loading_complete = False
 fade_started = False
 splash_image = pygame.image.load("src/splash.png").convert_alpha()
 scaled_width = int(splash_image.get_width() * (screen.get_height() / splash_image.get_height()))
-splash_image_scaled = pygame.transform.scale(splash_image, (scaled_width, screen.get_height()))
+splash_image_scaled = pygame.transform.scale(splash_image, (scaled_width*0.95, screen.get_height()))
 background_draw_x = int((screen.get_width() - scaled_width) / 2)
 
 fade_duration = 45  # frames for fade animation
@@ -111,7 +111,7 @@ def splash(): # will return true as long as the splash screen is being drawn
             fade_surface.fill((0,0,0))
             fade_surface.set_alpha(255 - alpha)
             screen.blit(fade_surface, (0, 0))
-            pygame.display.flip()
+            update_display()
             tick += 1
             return True
         else:
@@ -141,7 +141,7 @@ def splash(): # will return true as long as the splash screen is being drawn
         prompt_rect = prompt_text.get_rect(center=(screen.get_width() // 2, screen.get_height() - 60))
         screen.blit(prompt_text, prompt_rect)
 
-    pygame.display.flip()
+    update_display()
     tick += 1
 
     return True

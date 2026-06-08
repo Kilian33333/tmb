@@ -1,6 +1,6 @@
 """Pause menu for the fight"""
 import pygame
-from modules.screenSet import screen, WHITE, GRAY, BLACK
+from modules.screenSet import screen, WHITE, GRAY, BLACK, update_display
 from modules.settings_ui import settings_menu
 from modules.settings_manager import load_settings
 
@@ -86,4 +86,4 @@ def pause_menu():
                     else:
                         return action
         
-        pygame.display.flip()
+        update_display()

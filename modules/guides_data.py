@@ -1,9 +1,5 @@
 guides_data = [
     {
-        "title": "Demo",
-        "content": ["This is a demo guide. It doesn't have any real content, just some placeholder text or pre written phrases to show how the guides work.", "", "You can navigate through the guides using the UP and DOWN arrow keys, and press ENTER to select one.", "", "The content of each guide is displayed on the right side of the screen when selected.", "", "This demo guide is meant to be replaced with actual guides that provide useful information about the game.", "", "Feel free to explore the other guides for more details!"]
-    },
-    {
         "title": "First Words",
         "content": [
             "Hi, my name is Kilian. Before you start playing or reading the guides,",
@@ -18,10 +14,6 @@ guides_data = [
             "I know i was maybe talkin' a bit toooo much (it's 4am and i'm running on 160mg caffeine right now XD),",
             "but i just wanna say, that i hope you have fun playing this game :D"
         ]
-    },
-    {
-        "title": "Settings",
-        "content": ["Press ENTER to open Settings", "", "Configure:", "- Music Volume (0-120%)", "- Sound Effects Volume (0-120%)", "- Particle Effects (0-100%)", "- Screen Type (takes effect on restart)", "", "Use UP/DOWN to select setting", "ENTER to edit, LEFT/RIGHT to adjust", "ESC to save and return"]
     },
     {
         "title": "Controls",
@@ -181,15 +173,6 @@ guides_data = [
                 "All Music and artwork was made by me, Kilian."
                 "I wanted to create something unique and personal and show,"
                 " what is Possible if you just start doing it, learn it and try out stuff."]
-    },
-    {
-        "title": "Development",
-        "content": []
-    },
-    {
-        "title":"Behind the Scenes",
-           "content": ["Thats me, Kilian and my Gituar, composing music that you hear in this Game.<behind_the_scenes_kilian_1>",
-            "<behind_the_scenes_kilian_2>"]
     },
     {
         "title": "Credits",

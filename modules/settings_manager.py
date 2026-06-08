@@ -35,7 +35,7 @@ def load_settings():
                 raise ValueError("Invalid sound_effects_volume range")
             if not (0 <= data["particle_intensity"] <= 100):
                 raise ValueError("Invalid particle_intensity range")
-            if not isinstance(data["screen_type"], int) or data["screen_type"] < 0:
+            if not isinstance(data["screen_type"], int) or not (0 <= data["screen_type"] <= 2):
                 raise ValueError("Invalid screen_type")
             
             _current_settings = data

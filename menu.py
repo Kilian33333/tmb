@@ -2,6 +2,7 @@ import pygame
 import sys
 from main import main
 from modules.screenSet import *
+from modules.screenSet import update_display
 from modules.music import play_menu_music
 from modules.splash import splash
 from guides import *
@@ -13,7 +14,11 @@ pygame.init()
 
 pygame.display.set_caption("Main Menu")
 
+last_pressed_key = ""
+debug = False
+
 menu_button_font = pygame.font.Font("src/Jacquard24-Regular.ttf", 60)
+lil_font = pygame.font.Font("src/Jacquard24-Regular.ttf", 20)
 
 start_button_rect = pygame.Rect(screen.get_width() / 2 - 260, screen.get_height() / 2 + 160, 200, 70)
 guides_button_rect = pygame.Rect(screen.get_width() / 2 - 40, screen.get_height() / 2 + 160, 200, 70)
@@ -138,7 +143,18 @@ while running:
                     play_sound("hover", pan=30, volume=0.5)
                 elif menu_guides[selected_index]["action"] == "quit":
                     play_sound("hover", pan=70, volume=0.5)
-    pygame.display.flip()
+            if event.key == pygame.K_F3:
+                debug = True
+            if event.key == pygame.K_F2:
+                debug = False
+
+            if event.key != "":
+                last_pressed_key = pygame.key.name(event.key)
+    if debug == True:
+        screen.blit(lil_font.render(f"Pressed key: {last_pressed_key}", True, WHITE), (screen.get_width() / 2 - 300, screen.get_height() / 2 + 340))
+    else:
+        screen.blit(lil_font.render(f"Move LEFT/RIGHT to navigate, START to select", True, WHITE), (screen.get_width() / 2 - 400, screen.get_height() / 2 + 340))
+    update_display()
 
 pygame.quit()
 sys.exit()
