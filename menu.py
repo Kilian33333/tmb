@@ -15,19 +15,28 @@ pygame.display.set_caption("Main Menu")
 
 menu_button_font = pygame.font.Font("src/Jacquard24-Regular.ttf", 60)
 
-start_button_rect = pygame.Rect(screen.get_width() / 2 - 260, screen.get_height() / 2 + 160, 200, 70)
-guides_button_rect = pygame.Rect(screen.get_width() / 2 - 40, screen.get_height() / 2 + 160, 200, 70)
-settings_button_rect = pygame.Rect(screen.get_width() / 2 + 180, screen.get_height() / 2 + 160, 200, 70)
-quit_button_rect = pygame.Rect(screen.get_width() / 2 + 400, screen.get_height() / 2 + 160, 200, 70)
+start_button_rect = pygame.Rect(screen.get_width() / 2.1 - 260, screen.get_height() / 2 + 160, 200, 70)
+guides_button_rect = pygame.Rect(screen.get_width() / 2.1 - 40, screen.get_height() / 2 + 160, 200, 70)
+settings_button_rect = pygame.Rect(screen.get_width() / 2.1 + 180, screen.get_height() / 2 + 160, 200, 70)
+quit_button_rect = pygame.Rect(screen.get_width() / 2.1 + 400, screen.get_height() / 2 + 160, 200, 70)
 
 play_menu_music()
 background_image_original = pygame.image.load("src/knight_loading_screen_d.png").convert_alpha()
+#if screen_type == 2:  # Arcade mode, use different background
+    #background_image_original = pygame.image.load("src/arcade_background.png").convert_alpha()
+
 bg_original_width = background_image_original.get_width()
 bg_original_height = background_image_original.get_height()
+
 screen_height = screen.get_height()
 screen_width = screen.get_width()
-bg_scaled_width = int(bg_original_width * (screen_height / bg_original_height))
-bg_scaled_height = screen_height
+if screen_type == 2:  # Arcade mode, use different background scaling
+    bg_scaled_width = int(bg_original_width * (screen_height / bg_original_height))//1.1
+    bg_scaled_height = screen_height//1.1
+else:
+    bg_scaled_width = int(bg_original_width * (screen_height / bg_original_height))
+    bg_scaled_height = screen_height
+    
 background_image_scaled = pygame.transform.scale(background_image_original, (bg_scaled_width, bg_scaled_height))
 background_draw_x = int((screen_width - bg_scaled_width) / 2)
 

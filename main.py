@@ -31,6 +31,12 @@ bigger_font = pygame.font.Font("src/Jacquard24-Regular.ttf", 48)
 clean_font = pygame.font.Font("Dancing_Script/static/DancingScript-Bold.ttf", 20)
 background_img = None
 
+arcade_mode = False
+if screen_type == 2:
+    arcade_mode = True
+else:
+    arcade_mode = False
+
 # Initialize cutscene manager
 CutsceneManager.init(screen, clock, font)
 
@@ -129,7 +135,10 @@ class DamageIndicator:
 def draw_ui(player, enemy, fight_number, damage_indicators):
     #health bars
     screen.blit(player_health_bar_under, (285, 710))
-    screen.blit(enemy_health_bar_under, (WIDTH - 635, 710))
+    if arcade_mode:
+        screen.blit(enemy_health_bar_under, (WIDTH - 535, 710))
+    else:
+        screen.blit(enemy_health_bar_under, (WIDTH - 635, 710))
 
     #screen.blit(player_cooldownbar_under, (285, 610))
     #screen.blit(enemy_cooldownbar_under, (WIDTH - 735, 610))

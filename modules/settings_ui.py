@@ -26,7 +26,7 @@ SETTINGS_ITEMS = [
     {"name": "music_volume", "label": "Music Volume", "min": 0, "max": 120, "step": 10, "display": "%"},
     {"name": "sound_effects_volume", "label": "Sound Effects", "min": 0, "max": 120, "step": 10, "display": "%"},
     {"name": "particle_intensity", "label": "Particle Effects", "min": 0, "max": 100, "step": 10, "display": "%"},
-    {"name": "screen_type", "label": "Screen Type", "type": "enum", "options": ["Fullscreen", "Window"]},
+    {"name": "screen_type", "label": "Screen Type", "type": "enum", "options": ["Fullscreen", "Window", "Arcade"]},
 ]
 
 def draw_slider(y_pos, label, value, min_val, max_val, is_selected, is_editing, display_suffix=""):
