@@ -187,11 +187,6 @@ guides_data = [
         "content": []
     },
     {
-        "title":"Behind the Scenes",
-           "content": ["Thats me, Kilian and my Gituar, composing music that you hear in this Game.<behind_the_scenes_kilian_1>",
-            "<behind_the_scenes_kilian_2>"]
-    },
-    {
         "title": "Credits",
         "content": []
     },
