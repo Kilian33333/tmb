@@ -16,7 +16,7 @@ scaled_width = int(
 if screen_type == 2:
     splash_image_scaled = pygame.transform.scale(
         splash_image,
-        (int(scaled_width / 1.25), int(screen.get_height() / 1.25))
+        (int(scaled_width / 1.4), int(screen.get_height() / 1.4))
     )
 else:
     splash_image_scaled = pygame.transform.scale(

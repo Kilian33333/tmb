@@ -69,24 +69,87 @@ def load_data():
         return []
 
 
+import math
+
+# -----------------------------
+# Score Functions
+# -----------------------------
+
+def calculate_time_score(seconds):
+    """
+    Referenz:
+    370s ≈ 500 Punkte
+    390s ≈ 400 Punkte
+    Schnellere Zeiten -> mehr Punkte
+    Maximal 1000
+    """
+    score = 500 * math.exp(-0.01116 * (seconds - 370))
+    return int(max(0, min(1000, score)))
+
+
+def calculate_damage_score(damage):
+    """
+    Referenz:
+    500 DMG ≈ 500 Punkte
+    600 DMG ≈ 300 Punkte
+    <= 50 DMG = 1000 Punkte
+    """
+    if damage <= 50:
+        return 1000
+
+    score = 500 * math.exp(-0.00511 * (damage - 500))
+    return int(max(0, min(1000, score)))
+
+
+# -----------------------------
+# Top 10 Time
+# -----------------------------
+
 def get_top_10_time():
     data = load_data()
     sorted_data = tim_sort_time(data)
     top_10 = sorted_data[:10]
 
     if not top_10:
-        return [{"medal": "", "rank": "", "text": "No records yet", "color": GRAY}]
+        return [{
+            "medal": "",
+            "rank": "",
+            "text": "No records yet",
+            "color": GRAY
+        }]
 
     result = []
+
     for i, r in enumerate(top_10, start=1):
         medal = MEDAL_NAMES.get(i, "")
         color = MEDAL_COLORS.get(i, GRAY)
-        time_score = int(200 - ( 100 * math.pow(r['time_seconds'] / 370, 3))) if int(r['time_seconds']) < 370 else int(100 - math.pow((r['time_seconds'] - 370) / 370, 3))
-        formatted_time = format_timestamp(r.get('timestamp', ''))
-        text = f"{r['player_name']} - {r['time_seconds']}s  - Score: {time_score}"
-        result.append({"medal": medal, "rank": str(i), "text": text, "timestamp": formatted_time, "color": color})
+
+        time_score = calculate_time_score(r["time_seconds"])
+
+        formatted_time = format_timestamp(
+            r.get("timestamp", "")
+        )
+
+        text = (
+            f"{r['player_name']} - "
+            f"{r['time_seconds']}s - "
+            f"Score: {time_score}"
+        )
+
+        result.append({
+            "medal": medal,
+            "rank": str(i),
+            "text": text,
+            "timestamp": formatted_time,
+            "color": color
+        })
+
     return result
 
+
+# -----------------------------
+# Top 10 Damage
+# -----------------------------
 
 def get_top_10_damage():
     data = load_data()
@@ -94,50 +157,114 @@ def get_top_10_damage():
     top_10 = sorted_data[:10]
 
     if not top_10:
-        return [{"medal": "", "rank": "", "text": "No records yet", "color": GRAY}]
+        return [{
+            "medal": "",
+            "rank": "",
+            "text": "No records yet",
+            "color": GRAY
+        }]
 
     result = []
+
     for i, r in enumerate(top_10, start=1):
         medal = MEDAL_NAMES.get(i, "")
         color = MEDAL_COLORS.get(i, GRAY)
-        dmg_score = int(200 - ( 100 * math.pow(r['damage_taken'] / 640, 3))) if int(r['damage_taken']) < 640 else int(100 - (100 * math.pow((r['damage_taken'] - 640) / 640, 3)))
-        formatted_time = format_timestamp(r.get('timestamp', ''))
-        text = f"{r['player_name']} - DMG: {r['damage_taken']} - Score: {dmg_score}"
-        result.append({"medal": medal, "rank": str(i), "text": text, "timestamp": formatted_time, "color": color})
+
+        dmg_score = calculate_damage_score(
+            r["damage_taken"]
+        )
+
+        formatted_time = format_timestamp(
+            r.get("timestamp", "")
+        )
+
+        text = (
+            f"{r['player_name']} - "
+            f"DMG: {r['damage_taken']} - "
+            f"Score: {dmg_score}"
+        )
+
+        result.append({
+            "medal": medal,
+            "rank": str(i),
+            "text": text,
+            "timestamp": formatted_time,
+            "color": color
+        })
+
     return result
 
 
+# -----------------------------
+# Top 10 Total Score
+# -----------------------------
+
 def get_top_10_total_score():
     data = load_data()
-    
+
     if not data:
-        return [{"medal": "", "rank": "", "text": "No records yet", "color": GRAY}]
-    
-    # Calculate total scores for each record
+        return [{
+            "medal": "",
+            "rank": "",
+            "text": "No records yet",
+            "color": GRAY
+        }]
+
     records_with_scores = []
+
     for r in data:
-        time_score = int(200 - ( 100 * math.pow(r['time_seconds'] / 370, 3))) if int(r['time_seconds']) < 370 else int(100 - math.pow((r['time_seconds'] - 370) / 370, 3))
-        dmg_score = int(200 - ( 100 * math.pow(r['damage_taken'] / 640, 3))) if int(r['damage_taken']) < 640 else int(100 - (100 * math.pow((r['damage_taken'] - 640) / 640, 3)))
-        total_score = time_score + dmg_score
+        time_score = calculate_time_score(
+            r["time_seconds"]
+        )
+
+        dmg_score = calculate_damage_score(
+            r["damage_taken"]
+        )
+
+        # Durchschnitt statt Summe
+        total_score = int(
+            (time_score + dmg_score) / 2
+        )
+
         records_with_scores.append({
             **r,
             "time_score": time_score,
             "dmg_score": dmg_score,
             "total_score": total_score
         })
-    
-    # Sort by total score descending (highest first)
-    sorted_data = sorted(records_with_scores, key=lambda r: r["total_score"], reverse=True)
+
+    sorted_data = sorted(
+        records_with_scores,
+        key=lambda x: x["total_score"],
+        reverse=True
+    )
+
     top_10 = sorted_data[:10]
-    
+
     result = []
+
     for i, r in enumerate(top_10, start=1):
         medal = MEDAL_NAMES.get(i, "")
         color = MEDAL_COLORS.get(i, GRAY)
-        formatted_time = format_timestamp(r.get('timestamp', ''))
-        text = f"{r['player_name']} - Total Score: {r['total_score']}"
-        result.append({"medal": medal, "rank": str(i), "text": text, "timestamp": formatted_time, "color": color})
-    
+
+        formatted_time = format_timestamp(
+            r.get("timestamp", "")
+        )
+
+        text = (
+            f"{r['player_name']} - "
+            f"Total Score: {r['total_score']} "
+            f"(Time: {r['time_score']}, DMG: {r['dmg_score']})"
+        )
+
+        result.append({
+            "medal": medal,
+            "rank": str(i),
+            "text": text,
+            "timestamp": formatted_time,
+            "color": color
+        })
+
     return result
 
 # -------------------------------
