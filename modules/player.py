@@ -196,7 +196,7 @@ class Player(Fighter):
             self.set_animation("idle")
         
         # Jumping with SPACE
-        if keys[pygame.K_SPACE] and not self.is_jumping:
+        if (keys[pygame.K_SPACE] or keys[pygame.K_w]) and not self.is_jumping:
             if self.attack_cooldown == 0:
                 self.velocity_y = self.jump_power
                 self.is_jumping = True

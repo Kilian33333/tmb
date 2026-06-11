@@ -73,9 +73,9 @@ def pause_menu():
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
                     return "resume"
-                elif event.key == pygame.K_UP:
+                elif event.key == pygame.K_UP or event.key == pygame.K_w:
                     selected_index = (selected_index - 1) % len(PAUSE_OPTIONS)
-                elif event.key == pygame.K_DOWN:
+                elif event.key == pygame.K_DOWN or event.key == pygame.K_s:
                     selected_index = (selected_index + 1) % len(PAUSE_OPTIONS)
                 elif event.key == pygame.K_RETURN:
                     action = PAUSE_OPTIONS[selected_index]["action"]
