@@ -184,15 +184,15 @@ guides_data = [
     },
     {
         "title": "Development",
-        "content": []
-    },
-    {
-        "title": "Credits",
-        "content": []
+        "content": ["Developed by Bite the Byte Games.",
+                    "Main Developer: Kilian - Programming, Artwork, Music, Design",
+                    "Co-Developer: Jannis - Artwork, Design",
+                    "Special Thanks: Alen - Sound Mixing, Testing, Feedback",
+                    "Moritz - Testing, Feedback, Splash Screen Artwork, Intro"]
     },
     {
         "title": "Rights",
-        "content": []
+        "content": ["All content in this game is the intellectual property of Bite the Byte Games (Main Developer: Kilian Demski).",]
     },
     {
         "title": "Back to Menu",

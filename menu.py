@@ -120,9 +120,9 @@ while running:
             running = False
         elif event.type == pygame.KEYDOWN:
 
-            if event.key == pygame.K_LEFT:
+            if event.key == pygame.K_LEFT or event.key == pygame.K_a:
                 selected_index = (selected_index - 1) % len(menu_guides)
-            elif event.key == pygame.K_RIGHT:
+            elif event.key == pygame.K_RIGHT or event.key == pygame.K_d:
                 selected_index = (selected_index + 1) % len(menu_guides)
             elif event.key == pygame.K_RETURN:
                 action = menu_guides[selected_index]["action"]
@@ -138,7 +138,7 @@ while running:
                     load_settings()  # Reload settings in case they changed
                 elif action == "quit":
                     running = False
-            if event.key == pygame.K_LEFT or event.key == pygame.K_RIGHT:
+            if event.key == pygame.K_LEFT or event.key == pygame.K_RIGHT or event.key == pygame.K_a or event.key == pygame.K_d:
                 if menu_guides[selected_index]["action"] == "start":
                     play_sound("hover", pan=-70, volume=0.5)
                 elif menu_guides[selected_index]["action"] == "guides":

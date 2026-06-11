@@ -149,11 +149,11 @@ def settings_menu():
                     update_music_volume()
                     return True
                 
-                elif event.key == pygame.K_UP:
+                elif event.key == pygame.K_UP or event.key == pygame.K_w:
                     selected_index = (selected_index - 1) % len(SETTINGS_ITEMS)
                     editing_index = -1
                 
-                elif event.key == pygame.K_DOWN:
+                elif event.key == pygame.K_DOWN or event.key == pygame.K_s:
                     selected_index = (selected_index + 1) % len(SETTINGS_ITEMS)
                     editing_index = -1
                 
@@ -165,7 +165,7 @@ def settings_menu():
                         # Start editing
                         editing_index = selected_index
                 
-                elif event.key == pygame.K_LEFT and editing_index == selected_index:
+                elif event.key == pygame.K_LEFT or event.key == pygame.K_a and editing_index == selected_index:
                     item = SETTINGS_ITEMS[selected_index]
                     if item.get("type") == "enum":
                         current_value = setting_values[item["name"]]
@@ -176,7 +176,7 @@ def settings_menu():
                         new_value = max(item["min"], current_value - step)
                         setting_values[item["name"]] = new_value
                 
-                elif event.key == pygame.K_RIGHT and editing_index == selected_index:
+                elif (event.key == pygame.K_RIGHT or event.key == pygame.K_d) and editing_index == selected_index:
                     item = SETTINGS_ITEMS[selected_index]
                     if item.get("type") == "enum":
                         current_value = setting_values[item["name"]]

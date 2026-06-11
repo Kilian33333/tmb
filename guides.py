@@ -725,15 +725,15 @@ def guides():
             if event.type == pygame.QUIT:
                 return
             elif event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_UP:
+                if event.key == pygame.K_UP or event.key == pygame.K_w:
                     current_page = 0  # Reset page
                     selected_index = (selected_index - 1) % len(guides_data)
                     play_sound("hover", pan=-40, volume=0.5)
-                elif event.key == pygame.K_DOWN:
+                elif event.key == pygame.K_DOWN or event.key == pygame.K_s:
                     current_page = 0  # Reset page
                     selected_index = (selected_index + 1) % len(guides_data)
                     play_sound("hover", pan=-40, volume=0.5)
-                elif event.key == pygame.K_LEFT:
+                elif event.key == pygame.K_LEFT or event.key == pygame.K_a:
                     if current_guide["title"] == "Best Players":
                         # Best Players has pagination support
                         if current_page > 0:
@@ -745,7 +745,7 @@ def guides():
                         if current_page > 0:
                             current_page -= 1
                         play_sound("turn_page", pan=-40, volume=0.8)
-                elif event.key == pygame.K_RIGHT:
+                elif event.key == pygame.K_RIGHT or event.key == pygame.K_d:
                     if current_guide["title"] == "Best Players":
                         # Best Players has 2 pages
                         if current_page < 1:

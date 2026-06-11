@@ -294,7 +294,7 @@ def fight_loop(player, enemy, fight_number):
             player.attack(enemy, "Upward swing")
         if keys[pygame.K_c]:
             player.attack(enemy, "Side head strike")
-        if keys[pygame.K_x]:
+        if keys[pygame.K_x] or keys[pygame.K_s]:
             player.attack(enemy, "Direct Punch")        
         if keys[pygame.K_f] and player.ultimate_charge == 100:
             player.attack(enemy, "Ultimate")
