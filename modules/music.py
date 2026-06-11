@@ -13,6 +13,7 @@ def get_music_volume(base_volume):
 
 def init_mixer():
     """Initialize pygame mixer"""
+    pygame.mixer.pre_init(44100, -16, 2, 4096)  # 4096 or 8192
     pygame.mixer.init()
 
 def play_menu_music():

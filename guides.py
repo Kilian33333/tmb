@@ -9,6 +9,7 @@ from modules.months import MONTHS
 from modules.guides_data import guides_data, MEDAL_COLORS, MEDAL_NAMES
 from modules.sounds import *
 from modules.settings_ui import settings_menu
+from modules.settings_manager import load_settings
 
 
 pygame.init()
@@ -66,7 +67,7 @@ def load_data():
         with open("game_results.json", "r") as file:
             return json.load(file)
     except:
-        return []
+        return []      
 
 
 import math
@@ -402,7 +403,16 @@ def guides():
 
         # CONTENT AREA
         current_guide = guides_data[selected_index]
-
+        if screen_type != 2:
+            for i, guide in enumerate(guides_data):
+                if guide.get("title") == "Arcade Controls":
+                    del guides_data[i]
+                    break  # Remove title from content for display")  
+        elif screen_type == 2:
+            for i, guide in enumerate(guides_data):
+                if guide.get("title") == "Controls":
+                    del guides_data[i]
+                    break  # Remove title from content for display")
         # Behind the Scenes
         if current_guide["title"] == "Behind the Scenes":
             small_thx_text = guide_small_font.render("Special thx to my girlfriend, Emily, for helping me have fun, no matter what happened and keeping me motivated. ~Kilian ", True, WHITE)

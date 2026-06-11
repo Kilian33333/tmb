@@ -20,10 +20,13 @@ guides_button_rect = pygame.Rect(screen.get_width() / 2.1 - 40, screen.get_heigh
 settings_button_rect = pygame.Rect(screen.get_width() / 2.1 + 180, screen.get_height() / 2 + 160, 200, 70)
 quit_button_rect = pygame.Rect(screen.get_width() / 2.1 + 400, screen.get_height() / 2 + 160, 200, 70)
 
+if screen_type == 2:
+    ctrl_text = menu_button_font.render("Use the left Joystick to navigate, press 'Select' to select, controls are described in 'Arcade Controls'", True, GRAY)
+if screen_type != 2:
+    ctrl_text = menu_button_font.render("Use the arrow keys to navigate, press 'Enter' to select, controls are described in 'Controls'", True, GRAY)
+
 play_menu_music()
 background_image_original = pygame.image.load("src/knight_loading_screen_d.png").convert_alpha()
-#if screen_type == 2:  # Arcade mode, use different background
-    #background_image_original = pygame.image.load("src/arcade_background.png").convert_alpha()
 
 bg_original_width = background_image_original.get_width()
 bg_original_height = background_image_original.get_height()
@@ -147,6 +150,8 @@ while running:
                     play_sound("hover", pan=30, volume=0.5)
                 elif menu_guides[selected_index]["action"] == "quit":
                     play_sound("hover", pan=70, volume=0.5)
+    ctrl_text_scaled = pygame.transform.scale(ctrl_text, (ctrl_text.get_width()//2, ctrl_text.get_height()//2))
+    screen.blit(ctrl_text_scaled, (screen.get_width() // 2 - ctrl_text_scaled.get_width() // 2, screen.get_height() - 150))
     pygame.display.flip()
 
 pygame.quit()

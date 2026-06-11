@@ -1,7 +1,32 @@
 guides_data = [
     {
-        "title": "Demo",
-        "content": ["This is a demo guide. It doesn't have any real content, just some placeholder text or pre written phrases to show how the guides work.", "", "You can navigate through the guides using the UP and DOWN arrow keys, and press ENTER to select one.", "", "The content of each guide is displayed on the right side of the screen when selected.", "", "This demo guide is meant to be replaced with actual guides that provide useful information about the game.", "", "Feel free to explore the other guides for more details!"]
+        "title": "Arcade Controls",
+        "content": [
+            "X - Side Head Strike: Powerful precision strike to the head.",
+            "Nearly as strong as Upward Swing, similar cooldown.",
+            
+            "Y - Front Kick: Fast attack with decent damage.",
+            "  In the air: becomes Rush Kick, a diving aerial attack.",
+            "  Only one Rush Kick per jump.",
+            "  Diving into a shielding enemy bounces you back",
+            "  and deals a tiny bit of damage to yourself.",
+
+            "B - High Kick: Stronger hit that knocks the enemy back.",
+            "  Good for creating distance when the enemy is on top of you.",
+
+            "A - Upward Swing: Heavy strike, launches the enemy upward",
+            "  and sends them flying back. Your hardest hitting regular attack.",
+
+            "Select - Submit/Select you choice in the menu",
+
+            "Start - Ultimate Attack: Only usable when the Ultimate meter",
+            "  is completely full. Massive shockwave, huge damage,",
+
+            "Star - Pause/Resume the game, You find it in the front of the arcade machine.",
+
+            "Joystick - Up: Jump, Down: Direct Punch, Left: Move left and face left,",
+            "Right: Move right and face right"
+        ]
     },
     {
         "title": "First Words",
