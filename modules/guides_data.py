@@ -200,14 +200,6 @@ guides_data = [
         "content": []
     },
     {
-        "title": "Music and Artwork",
-        "content": ["<player_example_texture_1> is an example of the player textures used in the game.",
-                "All Player - Artwork was made by me, Kilian."
-                "All Music and artwork was made by me, Kilian."
-                "I wanted to create something unique and personal and show,"
-                " what is Possible if you just start doing it, learn it and try out stuff."]
-    },
-    {
         "title": "Development",
         "content": ["Developed by Bite the Byte Games.",
                     "Main Developer: Kilian - Programming, Artwork, Music, Design",
@@ -217,7 +209,8 @@ guides_data = [
     },
     {
         "title": "Rights",
-        "content": ["All content in this game is the intellectual property of Bite the Byte Games (Main Developer: Kilian Demski).",]
+        "content": ["All content in this game is the intellectual property of",
+                    "Bite the Byte Games (Main Developer: Kilian Demski).",]
     },
     {
         "title": "Back to Menu",
