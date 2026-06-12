@@ -19,12 +19,22 @@ class CutsceneManager:
         1: [  # Opening cutscene
             {
                 "image": None,
-                "text": "Knight of the North"
+                "text": "Press ENTER to jump between cutscenes"
             },
             {
                 "image": None,
-                "text": "Press ENTER to begin your journey..."
-            }
+                "text": "Start your journey."
+            },
+        ],
+        7: [
+            {
+                "image":None,
+                "text": "Press SELECT to jump between cutscenes"
+            },
+            {
+                "image": None,
+                "text": "Start your journey."
+            },
         ],
         2: [  # Game Over
             {

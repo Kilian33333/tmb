@@ -3,7 +3,7 @@ import pygame
 import math
 from modules.settings_manager import get_setting
 
-pygame.mixer.pre_init(44100, -16, 2, 4096)  # 4096 or 8192
+pygame.mixer.pre_init(44100, -16, 2, 8192)  # 4096 or 8192
 pygame.mixer.init()
 
 # Sounds einmal laden

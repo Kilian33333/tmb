@@ -476,10 +476,258 @@ def save_results(player_name, total_time, total_damage):
     
     print(f"Results saved: {player_name}, Time: {total_time}s, Damage: {total_damage}")
 
+def arcade_name_input(total_time, total_damage):
+    """
+    Arcade-style onscreen keyboard.
+    
+    wasd  = Move cursor
+    C     = Select letter
+    Enter = Submit
+    """
+    player_name = ""
+    clock = pygame.time.Clock()
 
+    font_small = pygame.font.Font("src/Jacquard24-Regular.ttf", 32)
+    font_large = pygame.font.Font("src/Jacquard24-Regular.ttf", 48)
+    font_help = pygame.font.Font("src/Jacquard24-Regular.ttf", 24)
+
+    keyboard = [
+        ["A","B","C","D","E","F","G","H","I","J"],
+        ["K","L","M","N","O","P","Q","R","S","T"],
+        ["U","V","W","X","Y","Z","0","1","2","3"],
+        ["4","5","6","7","8","9","DEL"]
+    ]
+
+    cursor_row = 0
+    cursor_col = 0
+
+    while True:
+        clock.tick(60)
+
+        for event in pygame.event.get():
+
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+
+            elif event.type == pygame.KEYDOWN:
+
+                if event.key == pygame.K_w:
+                    cursor_row = max(0, cursor_row - 1)
+                    cursor_col = min(
+                        cursor_col,
+                        len(keyboard[cursor_row]) - 1
+                    )
+
+                elif event.key == pygame.K_s:
+                    cursor_row = min(
+                        len(keyboard) - 1,
+                        cursor_row + 1
+                    )
+                    cursor_col = min(
+                        cursor_col,
+                        len(keyboard[cursor_row]) - 1
+                    )
+
+                elif event.key == pygame.K_a:
+                    cursor_col = max(0, cursor_col - 1)
+
+                elif event.key == pygame.K_d:
+                    cursor_col = min(
+                        len(keyboard[cursor_row]) - 1,
+                        cursor_col + 1
+                    )
+
+                elif event.key == pygame.K_c:
+
+                    selected = keyboard[cursor_row][cursor_col]
+
+                    if selected == "DEL":
+                        player_name = player_name[:-1]
+
+                    elif len(player_name) < 15:
+                        player_name += selected
+
+                elif event.key == pygame.K_RETURN:
+
+                    if len(player_name) > 0:
+                        save_results(
+                            player_name,
+                            int(total_time),
+                            int(total_damage)
+                        )
+                        return
+
+        screen.fill((30, 30, 50))
+
+        # Title
+        title = font_large.render(
+            "Victory!",
+            True,
+            (255, 215, 0)
+        )
+        screen.blit(
+            title,
+            (
+                WIDTH // 2 - title.get_width() // 2,
+                50
+            )
+        )
+
+        # Stats
+        time_text = font_small.render(
+            f"Time: {int(total_time)}s",
+            True,
+            (100, 200, 255)
+        )
+
+        damage_text = font_small.render(
+            f"Damage Taken: {int(total_damage)}",
+            True,
+            (255, 100, 100)
+        )
+
+        screen.blit(
+            time_text,
+            (
+                WIDTH // 2 - time_text.get_width() // 2,
+                140
+            )
+        )
+
+        screen.blit(
+            damage_text,
+            (
+                WIDTH // 2 - damage_text.get_width() // 2,
+                190
+            )
+        )
+
+        # Name box
+        label = font_small.render(
+            "Enter Name",
+            True,
+            (255, 255, 255)
+        )
+
+        screen.blit(
+            label,
+            (
+                WIDTH // 2 - label.get_width() // 2,
+                260
+            )
+        )
+
+        input_box = pygame.Rect(
+            WIDTH // 2 - 200,
+            310,
+            400,
+            60
+        )
+
+        pygame.draw.rect(
+            screen,
+            (255, 255, 255),
+            input_box,
+            2
+        )
+
+        name_text = font_small.render(
+            player_name + "_",
+            True,
+            (255, 255, 255)
+        )
+
+        screen.blit(
+            name_text,
+            (
+                input_box.x + 10,
+                input_box.y + 10
+            )
+        )
+
+        # Keyboard
+        key_w = 70
+        key_h = 60
+        gap = 8
+
+        start_y = 420
+
+        for row_idx, row in enumerate(keyboard):
+
+            row_width = len(row) * (key_w + gap) - gap
+            start_x = WIDTH // 2 - row_width // 2
+
+            for col_idx, key in enumerate(row):
+
+                rect = pygame.Rect(
+                    start_x + col_idx * (key_w + gap),
+                    start_y + row_idx * (key_h + gap),
+                    key_w,
+                    key_h
+                )
+
+                selected = (
+                    row_idx == cursor_row and
+                    col_idx == cursor_col
+                )
+
+                if selected:
+                    color = (255, 220, 0)
+                else:
+                    color = (70, 70, 110)
+
+                pygame.draw.rect(
+                    screen,
+                    color,
+                    rect,
+                    border_radius=4
+                )
+
+                pygame.draw.rect(
+                    screen,
+                    (255, 255, 255),
+                    rect,
+                    2,
+                    border_radius=4
+                )
+
+                txt = font_small.render(
+                    key,
+                    True,
+                    (255, 255, 255)
+                )
+
+                screen.blit(
+                    txt,
+                    (
+                        rect.centerx - txt.get_width() // 2,
+                        rect.centery - txt.get_height() // 2
+                    )
+                )
+
+        help_text = font_help.render(
+            "WASD TO NAVIGATE   C TO SELECT   ENTER TO SUBMIT".lower(),
+            True,
+            (200, 200, 200)
+        )
+
+        screen.blit(
+            help_text,
+            (
+                WIDTH // 2 - help_text.get_width() // 2,
+                start_y + 4 * (key_h + gap) + 20
+            )
+        )
+
+        pygame.display.update()
+        
 def results_screen(player, total_time):
     """Display results screen with name input and submit button"""
     total_damage = player.total_damage_taken
+    if screen_type == 2:
+        arcade_name_input(total_time, total_damage)
+        return
     player_name = ""
     font_small = pygame.font.Font("src/Jacquard24-Regular.ttf", 32)
     font_large = pygame.font.Font("src/Jacquard24-Regular.ttf", 48)
@@ -557,7 +805,10 @@ def results_screen(player, total_time):
 # --------------------
 
 def main():
-    CutsceneManager.show(1)  # Story intro (not counted)
+    if screen_type != 2:
+        CutsceneManager.show(1)  # Story intro (not counted)
+    else:
+        CutsceneManager.show(7)  # Story intro (not counted)
 
     player = Player(150)
     player.total_damage_taken = 0  # Track cumulative damage taken
