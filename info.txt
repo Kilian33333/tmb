@@ -1,0 +1,5 @@
+The Marauder Butcher ist ein anspruchsvolles 2D-Arcade-Kampfspiel,
+in dem du als magischer Ritter in 20 Kämpfen ein korruptes Königreich befreist.
+Das Kampfsystem setzt auf strategisches Timing, da Angriffe deine Bewegung blockieren und Feinde deine Taktik aktiv kontern.
+Ohne Checkpoints und mit nur begrenzter Heilung zwischen den Runden ist jeder feindliche Treffer absolut kritisch. Wer den finalen Boss bezwingt,
+kann sich in zwei Leaderboards nach Bestzeit oder minimalem Schaden verewigen sowie einem zusammengerechnetem ultimativem Leaderboard
