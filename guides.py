@@ -763,8 +763,8 @@ def guides():
                         play_sound("turn_page", pan=-40, volume=0.8)
                 elif event.key == pygame.K_RIGHT or event.key == pygame.K_d:
                     if current_guide["title"] == "Best Players":
-                        # Best Players has 2 pages
-                        if current_page < 1:
+                        # Best Players has 3 pages
+                        if current_page < 2:
                             current_page += 1
                         play_sound("turn_page", pan=40, volume=0.8)
                     elif current_guide["title"] != "Behind the Scenes":
