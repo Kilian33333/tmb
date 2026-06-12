@@ -52,7 +52,7 @@ MAX_FIGHTS = 20
 # --------------------
 # Assets
 # --------------------
-active_background = ["src/old_forest.png", "src/swapped_hills.jpeg", "src/wished_bridge.jpeg", "src/big_castle.jpg"]
+active_background = ["src/swapped_hills.jpeg", "src/swapped_hills.jpeg", "src/wished_bridge.jpeg", "src/big_castle.jpg"]
 
 ult_ui = pygame.image.load("src/ult_ui.png").convert_alpha()
 ult_ui = pygame.transform.scale(ult_ui, (170, 170))
@@ -481,8 +481,8 @@ def arcade_name_input(total_time, total_damage):
     Arcade-style onscreen keyboard.
     
     wasd  = Move cursor
-    C     = Select letter
-    Enter = Submit
+    X     = Select letter
+    Select = Submit
     """
     player_name = ""
     clock = pygame.time.Clock()
@@ -492,10 +492,10 @@ def arcade_name_input(total_time, total_damage):
     font_help = pygame.font.Font("src/Jacquard24-Regular.ttf", 24)
 
     keyboard = [
-        ["A","B","C","D","E","F","G","H","I","J"],
-        ["K","L","M","N","O","P","Q","R","S","T"],
-        ["U","V","W","X","Y","Z","0","1","2","3"],
-        ["4","5","6","7","8","9","DEL"]
+       ["a","b","c","d","e","f","g","h","i","j"],
+       ["k","l","m","n","o","p","q","r","s","t"],
+       ["u","v","w","x","y","z","0","1","2","3"],
+       ["4","5","6","7","8","9","del"]
     ]
 
     cursor_row = 0
@@ -542,7 +542,7 @@ def arcade_name_input(total_time, total_damage):
 
                     selected = keyboard[cursor_row][cursor_col]
 
-                    if selected == "DEL":
+                    if selected == "del":
                         player_name = player_name[:-1]
 
                     elif len(player_name) < 15:
