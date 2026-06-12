@@ -205,7 +205,9 @@ guides_data = [
                     "Main Developer: Kilian - Programming, Artwork, Music, Design",
                     "Co-Developer: Jannis - Artwork, Design",
                     "Special Thanks: Alen - Sound Mixing, Testing, Feedback",
-                    "Moritz - Testing, Feedback, Splash Screen Artwork, Intro"]
+                    "Moritz - Testing, Feedback, Splash Screen Artwork, Intro",
+                    "Our logo: ",
+                    "<logo>"]
     },
     {
         "title": "Rights",
